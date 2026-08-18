@@ -35,8 +35,8 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'kay-tii-tii.vercel.app/',
-    'https://kay-tii-tii.vercel.app/'
+    'kay-tii-tii.vercel.app',
+    'https://kay-tii-tii.vercel.app'
 ]
 
 
