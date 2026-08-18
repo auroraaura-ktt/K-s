@@ -1,0 +1,36 @@
+{% extends 'customadmin/base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-8">
+    <div class="card p-8 animate-fade-in-up">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 mx-auto bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-glow mb-4">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-extrabold text-navy mb-1">Admin Login</h2>
+            <p class="text-slate-500 text-sm">Sign in to manage your portfolio</p>
+        </div>
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+            <div>
+                <label class="form-label">Username</label>
+                {{ form.username }}
+            </div>
+            <div>
+                <label class="form-label">Password</label>
+                {{ form.password }}
+            </div>
+            <button type="submit" class="btn-primary w-full !py-3">
+                Login
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                </svg>
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

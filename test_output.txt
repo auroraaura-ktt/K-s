@@ -1,0 +1,3 @@
+OK: No Edit link on index page
+OK: View link present on index page
+OK: About/Pricing removed from navbar

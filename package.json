@@ -1,0 +1,14 @@
+{
+  "name": "profolio",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "node node_modules/@tailwindcss/cli/dist/index.mjs -i static/src/input.css -o static/css/tailwind.css --minify",
+    "build": "npm run build:css",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

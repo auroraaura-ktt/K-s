@@ -1,0 +1,42 @@
+{% extends 'customadmin/base.html' %}
+
+{% block title %}Message from {{ message.name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Message Details</h1>
+        <a href="{% url 'customadmin:message_list' %}" class="btn-secondary">Back to Messages</a>
+    </div>
+
+    <div class="card p-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Name</label>
+                <p class="text-gray-900">{{ message.name }}</p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">Email</label>
+                <p class="text-gray-900">{{ message.email }}</p>
+            </div>
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-500">Subject</label>
+            <p class="text-gray-900">{{ message.subject }}</p>
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-500">Date Sent</label>
+            <p class="text-gray-900">{{ message.date_sent|date:"M d, Y H:i" }}</p>
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-500">Message</label>
+            <div class="bg-gray-50 p-4 rounded-lg mt-1">
+                <p class="text-gray-900 whitespace-pre-wrap">{{ message.message }}</p>
+            </div>
+        </div>
+        <div class="flex justify-end space-x-4">
+            <a href="{% url 'customadmin:message_delete' message.pk %}" class="text-red-600 hover:text-red-800">Delete Message</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

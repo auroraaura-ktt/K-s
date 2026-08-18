@@ -1,0 +1,40 @@
+{% extends 'customadmin/base.html' %}
+
+{% block title %}Projects{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Projects</h1>
+    <a href="{% url 'customadmin:project_add' %}" class="btn-primary">Add Project</a>
+</div>
+
+{% if projects %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for project in projects %}
+    <div class="card p-6">
+        {% if project.photo %}
+        <img src="{{ project.photo.url }}" alt="{{ project.title }}" class="w-full h-32 object-cover rounded-lg mb-4">
+        {% else %}
+        <div class="w-full h-32 bg-gray-200 rounded-lg mb-4 flex items-center justify-center text-gray-500">
+            <span>No Image</span>
+        </div>
+        {% endif %}
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ project.title }}</h3>
+        <p class="text-gray-600 text-sm mb-4">{{ project.description|truncatechars:100 }}</p>
+        <div class="flex justify-between items-center">
+            <span class="text-xs text-gray-500">{{ project.date_created|date:"M d, Y" }}</span>
+            <div class="flex space-x-2">
+                <a href="{% url 'customadmin:project_edit' project.pk %}" class="btn-secondary text-sm">Edit</a>
+                <a href="{% url 'customadmin:project_delete' project.pk %}" class="text-red-600 hover:text-red-800 text-sm">Delete</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-12">
+    <h3 class="text-xl font-semibold text-gray-700 mb-2">No projects found</h3>
+    <a href="{% url 'customadmin:project_add' %}" class="btn-primary">Add Your First Project</a>
+</div>
+{% endif %}
+{% endblock %}

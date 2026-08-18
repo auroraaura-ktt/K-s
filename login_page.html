@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - My Portfolio Admin</title>
+    
+    <link href="/static/css/tailwind.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+
+<body class="bg-slate-50 min-h-screen flex flex-col">
+
+    <!-- Admin Header -->
+    <header class="gradient-header shadow-lg">
+        <nav class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="/myadmin/dashboard/" class="flex items-center space-x-3 group">
+                <div class="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm border border-white/30 shadow-glow-sm transition-transform duration-300 group-hover:rotate-12">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                </div>
+                <span class="text-white text-xl font-bold tracking-tight">Portfolio Admin Panel</span>
+            </a>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center px-4 py-12">
+        <div class="relative w-full max-w-md">
+            <!-- Decorative elements -->
+            <div class="absolute inset-0 pointer-events-none">
+                <div class="absolute top-[-100px] right-[-50px] w-64 h-64 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-3xl"></div>
+                <div class="absolute bottom-[-100px] left-[-50px] w-64 h-64 bg-gradient-to-tr from-accent/20 to-primary/20 rounded-full blur-3xl"></div>
+            </div>
+            
+            <div class="relative bg-white rounded-2xl shadow-2xl p-10 border border-slate-100 animate-fade-in-up">
+                <div class="text-center mb-8">
+                    <div class="w-16 h-16 mx-auto bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-glow mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-navy mb-1">Admin Login</h2>
+                    <p class="text-slate-500 text-sm">Sign in to manage your portfolio</p>
+                </div>
+                <form method="post" class="space-y-5">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="Sn0dG3WPOYM50RlR3Ff7X76yynqycjYDzDzBScJJ1bIVMCBtTqrVWJ6i7XyGkrGS">
+                    <div>
+                        <label class="form-label">Username</label>
+                        <input type="text" name="username" class="form-input" placeholder="Enter your username" autofocus maxlength="150" required id="id_username">
+                    </div>
+                    <div>
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-input" placeholder="Enter your password" required id="id_password">
+                    </div>
+                    <button type="submit" class="btn-primary w-full !py-3">
+                        Login
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                        </svg>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Admin Footer -->
+    <footer class="bg-navy text-white py-6">
+        <div class="container mx-auto text-center">
+            <p class="text-slate-400 text-sm">&copy; 2024 Portfolio Admin Panel</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>
