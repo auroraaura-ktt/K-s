@@ -9,24 +9,36 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#6366f1',
-        'primary-dark': '#4f46e5',
-        secondary: '#0ea5e9',
-        accent: '#f59e0b',
-        'accent-light': '#fbbf24',
-        navy: '#1e1b4b',
-        'navy-light': '#312e81',
+        primary: '#383838',
+        'primary-dark': '#2a2a2a',
+        secondary: '#696969',
+        accent: '#c9adb7',
+        'accent-light': '#d5c8d3',
+        navy: '#383838',
+        'navy-light': '#696969',
+        // Gradient colors
+        'gradient-pink': '#cdb5bd',
+        'gradient-purple': '#c9adb7',
+        'gradient-blue': '#8d9fcf',
+        'gradient-light': '#d5c8d3',
+        'gradient-soft': '#cbb2bb',
+        'accent-black': '#3c3c3c',
+        'bg-light': '#d4d4d6',
+        'border-gray': '#c8bdc4',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        display: ['Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        poppins: ['Poppins', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
       },
       boxShadow: {
-        'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
-        'card': '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04)',
-        'glow': '0 0 20px rgba(99, 102, 241, 0.3)',
-        'glow-sm': '0 0 12px rgba(99, 102, 241, 0.2)',
-        'colored': '0 20px 40px -12px rgba(99, 102, 241, 0.25)',
+        'soft': '0 2px 6px rgba(0, 0, 0, 0.06)',
+        'card': '0 14px 28px rgba(0, 0, 0, 0.10)',
+        'glow': '0 24px 42px rgba(0, 0, 0, 0.18)',
+        'glow-sm': '0 14px 26px rgba(0, 0, 0, 0.14)',
+        'colored': '0 24px 42px rgba(0, 0, 0, 0.18)',
+        'gradient': '0 10px 30px rgba(201, 173, 183, 0.15)',
+        'gradient-lg': '0 20px 45px rgba(201, 173, 183, 0.20)',
       },
       borderRadius: {
         'xl': '1rem',
@@ -40,6 +52,7 @@ module.exports = {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'float': 'float 3s ease-in-out infinite',
         'gradient-shift': 'gradientShift 8s ease infinite',
+        'gradient-flow': 'gradientFlow 6s ease infinite',
       },
       keyframes: {
         fadeIn: {
@@ -61,6 +74,11 @@ module.exports = {
         gradientShift: {
           '0%, 100%': { backgroundPosition: '0% 50%' },
           '50%': { backgroundPosition: '100% 50%' },
+        },
+        gradientFlow: {
+          '0%': { transform: 'translateX(-100%)', opacity: '0' },
+          '50%': { opacity: '1' },
+          '100%': { transform: 'translateX(100%)', opacity: '0' },
         },
       },
       backgroundSize: {

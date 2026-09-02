@@ -1,0 +1,37 @@
+{% extends 'customadmin/base.html' %}
+
+{% block title %}Social Links{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--color-text);">Social Links</h1>
+    <a href="{% url 'customadmin:sociallink_add' %}" class="btn-primary">Add Social Link</a>
+</div>
+
+{% if social_links %}
+<div style="display: flex; flex-direction: column; gap: 1rem;">
+    {% for link in social_links %}
+    <div class="card" style="padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <i class="{{ link.icon_class }}" style="font-size: 1.25rem; color: var(--color-primary);"></i>
+                <div>
+                    <h3 style="font-size: 1rem; font-weight: 600; color: var(--color-text);">{{ link.name }}{% if not link.is_active %} <span style="font-size: 0.75rem; color: #9ca3af;">(hidden)</span>{% endif %}</h3>
+                    <p style="font-size: 0.875rem; color: #6b7280;">{{ link.href }}</p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <a href="{% url 'customadmin:sociallink_edit' link.pk %}" class="btn-secondary" style="font-size: 0.875rem;">Edit</a>
+                <a href="{% url 'customadmin:sociallink_delete' link.pk %}" style="color: #dc2626; font-size: 0.875rem; text-decoration: none; cursor: pointer;">Delete</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div style="text-align: center; padding: 3rem 1rem;">
+    <h3 style="font-size: 1.25rem; font-weight: 600; color: #4b5563; margin-bottom: 0.5rem;">No social links found</h3>
+    <a href="{% url 'customadmin:sociallink_add' %}" class="btn-primary">Add Your First Social Link</a>
+</div>
+{% endif %}
+{% endblock %}

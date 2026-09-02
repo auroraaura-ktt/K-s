@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Education - Kay Tii Tii{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="page-wrap">
+
+        <div class="page-head">
+            <div>
+                <p class="page-label">Education</p>
+                <h1 class="page-title">Degrees & Certificates<span>.</span></h1>
+                <p class="page-sub">My academic background and certifications.</p>
+            </div>
+            {% if user.is_authenticated %}
+            <a href="{% url 'customadmin:education_add' %}" class="outline-btn" style="padding: 10px 18px;">+ Add Education</a>
+            {% endif %}
+        </div>
+
+        {% if educations %}
+        <div class="glass-card">
+            {% for edu in educations %}
+            <div class="info-card" style="margin-bottom: 12px; align-items: flex-start;">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <div style="flex: 1; min-width: 0;">
+                    <h3>{{ edu.degree }} &mdash; {{ edu.field_of_study }}</h3>
+                    <p style="color: var(--cyan);">{{ edu.institution }}</p>
+                    <p>
+                        {{ edu.start_date|date:"M Y" }} &ndash;
+                        {% if edu.end_date %}{{ edu.end_date|date:"M Y" }}{% else %}Present{% endif %}
+                    </p>
+                    {% if edu.description %}
+                    <p>{{ edu.description }}</p>
+                    {% endif %}
+                    {% if edu.certificate %}
+                    <a href="{{ edu.certificate.url }}" class="secondary-btn" download style="padding: 8px 14px; margin-top: 10px; display: inline-flex;">
+                        <i class="fa-solid fa-certificate"></i> View Certificate
+                    </a>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                    <div style="margin-top: 8px;">
+                        <a href="{% url 'customadmin:education_edit' edu.id %}" class="link-edit">Edit</a>
+                        <a href="{% url 'customadmin:education_delete' edu.id %}" class="link-del">Delete</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="glass-card">
+            <p style="color: var(--muted);">No education entries yet. {% if user.is_authenticated %}Add your first degree or certificate using the button above.{% endif %}</p>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

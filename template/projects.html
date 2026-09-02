@@ -1,109 +1,101 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 
-{% block title %}Projects - My Portfolio{% endblock %}
+{% block title %}Projects - Kay Tii Tii{% endblock %}
 
 {% block content %}
-<div class="relative overflow-hidden text-center mb-14 animate-fade-in-up">
-    <div class="absolute inset-0 pointer-events-none">
-        <div class="absolute top-[-50px] left-1/2 transform -translate-x-1/2 w-96 h-96 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full blur-3xl"></div>
-    </div>
-    <div class="relative">
-        <h1 class="text-4xl md:text-5xl font-extrabold text-navy mb-3 bg-gradient-to-r from-navy via-primary to-secondary bg-clip-text text-transparent">My Projects</h1>
-        <p class="text-slate-600 text-lg">A collection of my work and creative endeavors</p>
-        {% if user.is_authenticated %}
-        <div class="mt-6">
-            <a href="{% url 'customadmin:project_add' %}" class="btn-primary text-sm">+ Add Project</a>
+<section class="section projects-section">
+    <div class="page-wrap">
+
+        <div class="projects-header">
+            <div class="section-title left">
+                <h2>My Projects<span>.</span></h2>
+            </div>
+            {% if user.is_authenticated %}
+            <a href="{% url 'customadmin:project_add' %}" class="outline-btn">
+                + Add Project
+                <i class="fa-solid fa-plus"></i>
+            </a>
+            {% endif %}
+        </div>
+
+        {% if featured_projects %}
+        <div class="page-head">
+            <h2><span>&#9733;</span> Featured Projects</h2>
+        </div>
+        <div class="projects-grid" style="grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); margin-bottom: 40px;">
+            {% for project in featured_projects %}
+            <article class="project-card">
+                <div class="project-image">
+                    {% if project.photo %}
+                    <img src="{{ project.photo.url }}" alt="{{ project.title }}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                    <div class="detail-placeholder" style="height: 165px;">No Image</div>
+                    {% endif %}
+                    <div style="position: absolute; top: 10px; right: 10px;"><span class="badge-cyan">Featured</span></div>
+                </div>
+                <div class="project-info">
+                    <h3>{{ project.title }}</h3>
+                    <p>{{ project.description|truncatechars:100 }}</p>
+                    <div class="project-bottom">
+                        <span>{{ project.date_created|date:"M d, Y" }}</span>
+                        <a href="{% url 'project_detail' project.id %}" aria-label="View details">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+                    {% if user.is_authenticated %}
+                    <div style="margin-top: 10px;">
+                        <a href="{% url 'customadmin:project_edit' project.id %}" class="link-edit">Edit</a>
+                        <a href="{% url 'customadmin:project_delete' project.id %}" class="link-del">Delete</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </article>
+            {% endfor %}
         </div>
         {% endif %}
-    </div>
-</div>
 
-{% if featured_projects %}
-<div class="mb-14 animate-fade-in-up" style="animation-delay: 0.2s;">
-    <div class="flex items-center gap-3 mb-8">
-        <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center shadow-glow-sm">
-            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2l1.5 4.5L16 8l-4.5 1.5L10 14l-1.5-4.5L4 8l4.5-1.5L10 2z"/></svg>
+        <div class="page-head">
+            <h2>All Projects<span>.</span></h2>
         </div>
-        <h2 class="text-2xl font-bold text-navy">Featured Projects</h2>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {% for project in featured_projects %}
-        <div class="card card-hover group">
-            <div class="relative overflow-hidden">
-                {% if project.photo %}
-                <img src="{{ project.photo.url }}" class="project-image" alt="{{ project.title }}" loading="lazy">
-                {% else %}
-                <div class="placeholder-image"><span class="text-sm font-medium">No Image</span></div>
-                {% endif %}
-                <div class="absolute top-3 right-3"><span class="badge-featured">Featured</span></div>
-            </div>
-            <div class="p-6">
-                <h5 class="text-xl font-bold text-navy mb-2 group-hover:text-primary transition-colors">{{ project.title }}</h5>
-                <p class="text-slate-600 mb-5">{{ project.description|truncatechars:100 }}</p>
-                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
-                    <a href="{% url 'project_detail' project.id %}" class="btn-secondary text-sm !py-2 !px-4">View Details
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                    </a>
-                    <small class="text-slate-400">{{ project.date_created|date:"M d, Y" }}</small>
-                </div>
-                {% if user.is_authenticated %}
-                <div class="flex space-x-2 mt-3 pt-3 border-t border-slate-100">
-                    <a href="{% url 'customadmin:project_edit' project.id %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Edit</a>
-                    <a href="{% url 'customadmin:project_delete' project.id %}" class="text-red-600 hover:text-red-800 text-sm font-medium">Delete</a>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
-{% endif %}
 
-<div class="mb-12 animate-fade-in-up" style="animation-delay: 0.3s;">
-    <div class="flex items-center gap-3 mb-8">
-        <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-glow-sm">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-        </div>
-        <h2 class="text-2xl font-bold text-navy">All Projects</h2>
-    </div>
-    {% if projects %}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {% for project in projects %}
-        <div class="card card-hover group">
-            <div class="relative overflow-hidden">
-                {% if project.photo %}
-                <img src="{{ project.photo.url }}" class="project-image" alt="{{ project.title }}" loading="lazy">
-                {% else %}
-                <div class="placeholder-image"><span class="text-sm font-medium">No Image</span></div>
-                {% endif %}
-            </div>
-            <div class="p-6">
-                <h5 class="text-xl font-bold text-navy mb-2 group-hover:text-primary transition-colors">{{ project.title }}</h5>
-                <p class="text-slate-600 mb-5">{{ project.description|truncatechars:100 }}</p>
-                <div class="flex justify-between items-center pt-4 border-t border-slate-100">
-                    <a href="{% url 'project_detail' project.id %}" class="btn-secondary text-sm !py-2 !px-4">View Details
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                    </a>
-                    <small class="text-slate-400">{{ project.date_created|date:"M d, Y" }}</small>
+        {% if projects %}
+        <div class="projects-grid" style="grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));">
+            {% for project in projects %}
+            <article class="project-card">
+                <div class="project-image">
+                    {% if project.photo %}
+                    <img src="{{ project.photo.url }}" alt="{{ project.title }}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                    {% else %}
+                    <div class="detail-placeholder" style="height: 165px;">No Image</div>
+                    {% endif %}
                 </div>
-                {% if user.is_authenticated %}
-                <div class="flex space-x-2 mt-3 pt-3 border-t border-slate-100">
-                    <a href="{% url 'customadmin:project_edit' project.id %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Edit</a>
-                    <a href="{% url 'customadmin:project_delete' project.id %}" class="text-red-600 hover:text-red-800 text-sm font-medium">Delete</a>
+                <div class="project-info">
+                    <h3>{{ project.title }}</h3>
+                    <p>{{ project.description|truncatechars:100 }}</p>
+                    <div class="project-bottom">
+                        <span>{{ project.date_created|date:"M d, Y" }}</span>
+                        <a href="{% url 'project_detail' project.id %}" aria-label="View details">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+                    {% if user.is_authenticated %}
+                    <div style="margin-top: 10px;">
+                        <a href="{% url 'customadmin:project_edit' project.id %}" class="link-edit">Edit</a>
+                        <a href="{% url 'customadmin:project_delete' project.id %}" class="link-del">Delete</a>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-            </div>
+            </article>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200">
-        <div class="w-16 h-16 mx-auto bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
-            <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        {% else %}
+        <div class="glass-card" style="text-align: center; padding: 50px 30px;">
+            <i class="fa-solid fa-box-open" style="font-size: 32px; color: var(--cyan); margin-bottom: 12px;"></i>
+            <h2>No projects available<span>.</span></h2>
+            <p>Projects will be added soon.</p>
         </div>
-        <h3 class="text-xl font-bold text-slate-700 mb-2">No projects available</h3>
-        <p class="text-slate-500">Projects will be added soon.</p>
+        {% endif %}
+
     </div>
-    {% endif %}
-</div>
+</section>
 {% endblock %}

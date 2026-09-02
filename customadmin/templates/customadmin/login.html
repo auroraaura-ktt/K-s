@@ -3,34 +3,42 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="max-w-md mx-auto mt-8">
-    <div class="card p-8 animate-fade-in-up">
-        <div class="text-center mb-8">
-            <div class="w-16 h-16 mx-auto bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-glow mb-4">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<div style="max-width: 28rem; margin: 2rem auto;">
+    <div class="card animate-fade-in-up">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="width: 4rem; height: 4rem; margin: 0 auto; background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-purple)); border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(201, 173, 183, 0.25); margin-bottom: 1rem;">
+                <svg style="width: 2rem; height: 2rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                 </svg>
             </div>
-            <h2 class="text-2xl font-extrabold text-navy mb-1">Admin Login</h2>
-            <p class="text-slate-500 text-sm">Sign in to manage your portfolio</p>
+            <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.25rem;">Admin Login</h2>
+            <p style="color: #696969; font-size: 0.875rem;">Sign in to manage your portfolio</p>
         </div>
-        <form method="post" class="space-y-5">
+        <form method="post">
             {% csrf_token %}
-            <div>
-                <label class="form-label">Username</label>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--color-text); font-weight: 600; font-size: 0.875rem;">Username</label>
                 {{ form.username }}
             </div>
-            <div>
-                <label class="form-label">Password</label>
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--color-text); font-weight: 600; font-size: 0.875rem;">Password</label>
                 {{ form.password }}
             </div>
-            <button type="submit" class="btn-primary w-full !py-3">
+            <button type="submit" style="width: 100%; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-purple)); color: white; border: none; border-radius: 8px; font-weight: 600; font-size: 0.875rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(201, 173, 183, 0.25);">
                 Login
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                 </svg>
             </button>
         </form>
+        <div style="text-align: center; margin-top: 1.25rem;">
+            <a href="{% url 'home' %}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.25rem; background: transparent; color: var(--color-text); border: 1px solid var(--color-border, rgba(0,0,0,0.15)); border-radius: 8px; font-weight: 600; font-size: 0.875rem; text-decoration: none; transition: all 0.3s ease;">
+                <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                Go to Home Page
+            </a>
+        </div>
     </div>
 </div>
 {% endblock %}

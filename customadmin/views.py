@@ -10,6 +10,7 @@ from mytask.models import (
     Experience,
     Education,
     ContactMessage,
+    SocialLink,
 )
 from .forms import (
     AdminLoginForm,
@@ -18,6 +19,7 @@ from .forms import (
     SkillForm,
     ExperienceForm,
     EducationForm,
+    SocialLinkForm,
 )
 
 
@@ -264,7 +266,10 @@ def education_list(request):
 @login_required
 def education_add(request):
     if request.method == 'POST':
-        form = EducationForm(request.POST)
+        form = EducationForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Education added successfully.')
         if form.is_valid():
             form.save()
             messages.success(request, 'Education added successfully.')
@@ -278,7 +283,7 @@ def education_add(request):
 def education_edit(request, pk):
     education = get_object_or_404(Education, pk=pk)
     if request.method == 'POST':
-        form = EducationForm(request.POST, instance=education)
+        form = EducationForm(request.POST, request.FILES, instance=education)
         if form.is_valid():
             form.save()
             messages.success(request, 'Education updated successfully.')
@@ -297,6 +302,53 @@ def education_delete(request, pk):
         return redirect('customadmin:education_list')
     return render(request, 'customadmin/confirm_delete.html', {
         'object': education, 'model_name': 'Education',
+    })
+
+
+# Social Links CRUD
+
+@login_required
+def sociallink_list(request):
+    social_links = SocialLink.objects.all()
+    return render(request, 'customadmin/sociallink_list.html', {'social_links': social_links})
+
+
+@login_required
+def sociallink_add(request):
+    if request.method == 'POST':
+        form = SocialLinkForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Social link added successfully.')
+            return redirect('customadmin:sociallink_list')
+    else:
+        form = SocialLinkForm()
+    return render(request, 'customadmin/sociallink_form.html', {'form': form, 'action': 'Add'})
+
+
+@login_required
+def sociallink_edit(request, pk):
+    social_link = get_object_or_404(SocialLink, pk=pk)
+    if request.method == 'POST':
+        form = SocialLinkForm(request.POST, instance=social_link)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Social link updated successfully.')
+            return redirect('customadmin:sociallink_list')
+    else:
+        form = SocialLinkForm(instance=social_link)
+    return render(request, 'customadmin/sociallink_form.html', {'form': form, 'action': 'Edit'})
+
+
+@login_required
+def sociallink_delete(request, pk):
+    social_link = get_object_or_404(SocialLink, pk=pk)
+    if request.method == 'POST':
+        social_link.delete()
+        messages.success(request, 'Social link deleted successfully.')
+        return redirect('customadmin:sociallink_list')
+    return render(request, 'customadmin/confirm_delete.html', {
+        'object': social_link, 'model_name': 'Social Link',
     })
 
 

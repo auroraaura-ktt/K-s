@@ -41,6 +41,12 @@ urlpatterns = [
     path('education/<int:pk>/edit/', views.education_edit, name='education_edit'),
     path('education/<int:pk>/delete/', views.education_delete, name='education_delete'),
 
+    # Social Links
+    path('social-links/', views.sociallink_list, name='sociallink_list'),
+    path('social-links/add/', views.sociallink_add, name='sociallink_add'),
+    path('social-links/<int:pk>/edit/', views.sociallink_edit, name='sociallink_edit'),
+    path('social-links/<int:pk>/delete/', views.sociallink_delete, name='sociallink_delete'),
+
     # Contact Messages
     path('messages/', views.message_list, name='message_list'),
     path('messages/<int:pk>/', views.message_detail, name='message_detail'),

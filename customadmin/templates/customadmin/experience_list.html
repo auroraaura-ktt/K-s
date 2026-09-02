@@ -3,35 +3,35 @@
 {% block title %}Experience{% endblock %}
 
 {% block content %}
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-900">Experience</h1>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--color-text);">Experience</h1>
     <a href="{% url 'customadmin:experience_add' %}" class="btn-primary">Add Experience</a>
 </div>
 
 {% if experiences %}
-<div class="space-y-4">
+<div style="display: flex; flex-direction: column; gap: 1rem;">
     {% for exp in experiences %}
-    <div class="card p-6">
-        <div class="flex justify-between items-start">
+    <div class="card" style="padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
             <div>
-                <h3 class="text-lg font-semibold text-gray-900">{{ exp.title }}</h3>
-                <p class="text-gray-600">{{ exp.company }} &middot; {{ exp.location }}</p>
-                <p class="text-sm text-gray-500">
+                <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--color-text);">{{ exp.title }}</h3>
+                <p style="color: #4b5563;">{{ exp.company }} &middot; {{ exp.location }}</p>
+                <p style="font-size: 0.875rem; color: #6b7280;">
                     {{ exp.start_date|date:"M Y" }} - {% if exp.is_current %}Present{% else %}{{ exp.end_date|date:"M Y" }}{% endif %}
                 </p>
-                <p class="text-gray-600 mt-2">{{ exp.description }}</p>
+                <p style="color: #4b5563; margin-top: 0.5rem;">{{ exp.description }}</p>
             </div>
-            <div class="flex space-x-2">
-                <a href="{% url 'customadmin:experience_edit' exp.pk %}" class="btn-secondary text-sm">Edit</a>
-                <a href="{% url 'customadmin:experience_delete' exp.pk %}" class="text-red-600 hover:text-red-800 text-sm">Delete</a>
+            <div style="display: flex; gap: 0.5rem;">
+                <a href="{% url 'customadmin:experience_edit' exp.pk %}" class="btn-secondary" style="font-size: 0.875rem;">Edit</a>
+                <a href="{% url 'customadmin:experience_delete' exp.pk %}" style="color: #dc2626; font-size: 0.875rem; text-decoration: none; cursor: pointer;">Delete</a>
             </div>
         </div>
     </div>
     {% endfor %}
 </div>
 {% else %}
-<div class="text-center py-12">
-    <h3 class="text-xl font-semibold text-gray-700 mb-2">No experiences found</h3>
+<div style="text-align: center; padding: 3rem 1rem;">
+    <h3 style="font-size: 1.25rem; font-weight: 600; color: #4b5563; margin-bottom: 0.5rem;">No experiences found</h3>
     <a href="{% url 'customadmin:experience_add' %}" class="btn-primary">Add Your First Experience</a>
 </div>
 {% endif %}

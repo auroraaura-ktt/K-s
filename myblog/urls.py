@@ -15,6 +15,7 @@ urlpatterns = [
     path('myadmin/', include('customadmin.urls', namespace='customadmin')),
     path('', views.home, name='home'),
     path('about/', views.about, name='about'),
+    path('education/', views.education, name='education'),
     path('projects/', views.projects, name='projects'),
     path('project/<int:project_id>/', views.project_detail, name='project_detail'),
     path('contact/', views.contact, name='contact'),

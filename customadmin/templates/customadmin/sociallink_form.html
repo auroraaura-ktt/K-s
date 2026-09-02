@@ -1,0 +1,41 @@
+{% extends 'customadmin/base.html' %}
+
+{% block title %}{{ action }} Social Link{% endblock %}
+
+{% block content %}
+<div style="max-width: 42rem; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--color-text);">{{ action }} Social Link</h1>
+        <a href="{% url 'customadmin:sociallink_list' %}" class="btn-secondary">Back</a>
+    </div>
+
+    <div class="card" style="padding: 1.5rem;">
+        <form method="post" style="display: flex; flex-direction: column; gap: 1rem;">
+            {% csrf_token %}
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Name</label>
+                {{ form.name }}
+                {% if form.name.errors %}<p style="color: #ff6b7a; font-size: 0.8rem; margin-top: 0.25rem;">{{ form.name.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Link</label>
+                {{ form.url }}
+                {% if form.url.errors %}<p style="color: #ff6b7a; font-size: 0.8rem; margin-top: 0.25rem;">{{ form.url.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Icon (optional)</label>
+                {{ form.icon }}
+                <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem;">Leave blank to auto-detect from the name (GitHub, LinkedIn, Instagram, Email, etc.)</p>
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Order</label>
+                {{ form.order }}
+            </div>
+            <div>
+                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 500; color: var(--color-text);">Visible on site {{ form.is_active }}</label>
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%;">Save</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

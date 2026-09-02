@@ -3,74 +3,71 @@
 {% block title %}{{ action }} Profile{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-900">{{ action }} Profile</h1>
+<div style="max-width: 42rem; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--color-text);">{{ action }} Profile</h1>
         <a href="{% url 'customadmin:profile_list' %}" class="btn-secondary">Back</a>
     </div>
 
-    <div class="card p-6">
-        <form method="post" enctype="multipart/form-data" class="space-y-4">
+    <div class="card" style="padding: 1.5rem;">
+        <form method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1rem;">
             {% csrf_token %}
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Name</label>
                     {{ form.name }}
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Title</label>
                     {{ form.title }}
                 </div>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Email</label>
                 {{ form.email }}
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Phone</label>
                 {{ form.phone }}
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Location</label>
                 {{ form.location }}
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Bio</label>
                 {{ form.bio }}
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">GitHub URL</label>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">GitHub URL</label>
                     {{ form.github }}
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">LinkedIn URL</label>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">LinkedIn URL</label>
                     {{ form.linkedin }}
                 </div>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Twitter URL</label>
-                    {{ form.twitter }}
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Website URL</label>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Website URL</label>
                     {{ form.website }}
+                    {% if form.website.errors %}<p style="color: #ff6b7a; font-size: 0.8rem; margin-top: 0.25rem;">{{ form.website.errors.0 }}</p>{% endif %}
                 </div>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Photo</label>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Photo</label>
                 {{ form.photo }}
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Resume</label>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Resume</label>
                 {{ form.resume }}
             </div>
-            <div class="flex items-center">
+            <div style="display: flex; align-items: center;">
                 {{ form.is_active }}
-                <label class="ml-2 text-sm font-medium text-gray-700">Active</label>
+                <label style="margin-left: 0.5rem; font-size: 0.875rem; font-weight: 500; color: var(--color-text);">Active</label>
             </div>
-            <button type="submit" class="btn-primary w-full">Save</button>
+            <button type="submit" class="btn-primary" style="width: 100%;">Save</button>
         </form>
     </div>
 </div>

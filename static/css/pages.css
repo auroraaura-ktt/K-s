@@ -1,0 +1,535 @@
+/* Page-specific styles to work with design-system.css */
+
+/* ============================================
+   HOME PAGE STYLES
+   ============================================ */
+
+.hero-section {
+    position: relative;
+    padding: 4rem 2rem;
+    text-align: center;
+}
+
+.hero-profile-image {
+    width: 11rem;
+    height: 11rem;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid white;
+    box-shadow: 0 12px 32px rgba(201, 173, 183, 0.25);
+    display: inline-block;
+}
+
+.section-label {
+    color: var(--color-accent-rose);
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+}
+
+.social-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    border: 2px solid var(--color-border);
+    color: var(--color-accent-rose);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.social-icon:hover {
+    background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-purple));
+    color: white;
+    transform: translateY(-4px);
+    border-color: var(--color-accent-rose);
+}
+
+/* ============================================
+   PROJECT CARD STYLES
+   ============================================ */
+
+.card-gradient {
+    background: linear-gradient(135deg, rgba(205, 181, 189, 0.1), rgba(141, 159, 207, 0.1));
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.card-gradient:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.timeline-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--color-accent-rose), var(--color-accent-purple));
+    border-radius: 2px;
+}
+
+.timeline-item::after {
+    content: "";
+    position: absolute;
+    left: -4px;
+    top: 1.5rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-purple));
+    border: 2px solid var(--color-white);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(201, 173, 183, 0.15);
+}
+
+.project-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.card-hover .project-image {
+    transform: scale(1);
+}
+
+.card-hover:hover .project-image {
+    transform: scale(1.05);
+}
+
+.placeholder-image {
+    background: linear-gradient(135deg, var(--color-grad-1), var(--color-grad-3));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+}
+
+.badge-featured {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-purple));
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* ============================================
+   SKILL BAR STYLES
+   ============================================ */
+
+.skill-bar {
+    height: 6px;
+    background: var(--color-bg);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.skill-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-accent-rose), var(--color-accent-purple));
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.icon-chip {
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(201, 173, 183, 0.1);
+    border-radius: 8px;
+}
+
+/* ============================================
+   CONTACT FORM STYLES
+   ============================================ */
+
+.form-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 2rem;
+    background: white;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    font-family: var(--font-secondary);
+    color: var(--color-text);
+    background-color: white;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-accent-rose);
+    box-shadow: 0 0 0 3px rgba(201, 173, 183, 0.1);
+}
+
+/* ============================================
+   ALBUM STYLES
+   ============================================ */
+
+.album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.album-card {
+    background: white;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.album-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(201, 173, 183, 0.15);
+}
+
+.album-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.album-card:hover .album-image {
+    transform: scale(1.05);
+}
+
+.album-content {
+    padding: 1.5rem;
+}
+
+/* ============================================
+   TABLE STYLES
+   ============================================ */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table thead {
+    background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-purple));
+    color: white;
+}
+
+table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+table td {
+    padding: 1rem;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-text);
+}
+
+table tbody tr:hover {
+    background-color: rgba(201, 173, 183, 0.05);
+}
+
+/* ============================================
+   ADMIN LIST PAGE STYLES
+   ============================================ */
+
+.admin-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.admin-list-header h1 {
+    color: var(--color-text);
+    font-size: 2rem;
+    font-weight: 800;
+    text-transform: capitalize;
+    letter-spacing: -1px;
+}
+
+.admin-list-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.action-btn {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.action-btn-edit {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.action-btn-edit:hover {
+    background: #3b82f6;
+    color: white;
+}
+
+.action-btn-delete {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.action-btn-delete:hover {
+    background: #ef4444;
+    color: white;
+}
+
+/* ============================================
+   MESSAGE / NOTIFICATION STYLES
+   ============================================ */
+
+.message-list {
+    max-width: 100%;
+}
+
+.message-item {
+    background: white;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.message-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.message-sender {
+    font-weight: 600;
+    color: var(--color-accent-rose);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.message-subject {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0.5rem 0;
+}
+
+.message-body {
+    color: var(--color-text);
+    line-height: 1.6;
+    margin: 1rem 0;
+}
+
+.message-date {
+    font-size: 0.75rem;
+    color: rgba(201, 173, 183, 0.7);
+}
+
+/* ============================================
+   CONFIRM DELETE DIALOG
+   ============================================ */
+
+.confirm-dialog {
+    background: white;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 400px;
+    margin: 2rem auto;
+    text-align: center;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+
+.confirm-dialog h2 {
+    color: var(--color-text);
+    margin-bottom: 1rem;
+}
+
+.confirm-dialog p {
+    color: var(--color-text);
+    margin-bottom: 2rem;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 2rem 1rem;
+    }
+
+    .hero-profile-image {
+        width: 9rem;
+        height: 9rem;
+    }
+
+    .album-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .admin-list-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    table {
+        font-size: 0.875rem;
+    }
+
+    table th,
+    table td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .form-container {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-profile-image {
+        width: 7rem;
+        height: 7rem;
+    }
+
+    .hero-section {
+        padding: 1.5rem 1rem;
+    }
+
+    .section-label {
+        font-size: 0.75rem;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    .album-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .social-icon {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .confirm-buttons {
+        flex-direction: column;
+    }
+}

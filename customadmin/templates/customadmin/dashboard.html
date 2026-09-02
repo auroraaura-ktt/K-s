@@ -3,75 +3,87 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<div class="mb-8 animate-fade-in-up">
-    <h1 class="text-3xl md:text-4xl font-extrabold text-navy bg-gradient-to-r from-navy via-primary to-secondary bg-clip-text text-transparent mb-2">Dashboard</h1>
-    <p class="text-slate-600">Overview of your portfolio content</p>
+<div style="margin-bottom: 2rem; animation-delay: 0;" class="animate-fade-in-up">
+    <h1 style="font-size: clamp(1.875rem, 3vw, 2.25rem); font-weight: 800; margin-bottom: 0.5rem;">Dashboard</h1>
+    <p style="color: #696969;">Overview of your portfolio content</p>
 </div>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-    <div class="card p-6 text-center card-hover group animate-fade-in-up" style="animation-delay: 0.1s;">
-        <div class="w-12 h-12 mx-auto bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center shadow-glow-sm mb-3 group-hover:scale-110 transition-transform duration-300">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <!-- Projects Card -->
+    <div class="card card-hover animate-fade-in-up" style="text-align: center; animation-delay: 0.1s;">
+        <div style="width: 3rem; height: 3rem; margin: 0 auto; background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-purple)); border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(201, 173, 183, 0.25); margin-bottom: 1rem; transition: transform 0.3s ease;">
+            <svg style="width: 1.5rem; height: 1.5rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
         </div>
-        <div class="text-3xl font-extrabold text-navy mb-1">{{ stats.projects }}</div>
-        <p class="text-slate-600 mb-3">Projects</p>
-        <a href="{% url 'customadmin:project_list' %}" class="btn-secondary text-sm !px-4 !py-1.5">Manage</a>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.5rem;">{{ stats.projects }}</div>
+        <p style="color: #696969; margin-bottom: 1rem;">Projects</p>
+        <a href="{% url 'customadmin:project_list' %}" class="btn-secondary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">Manage</a>
     </div>
-    <div class="card p-6 text-center card-hover group animate-fade-in-up" style="animation-delay: 0.2s;">
-        <div class="w-12 h-12 mx-auto bg-gradient-to-br from-secondary to-accent rounded-2xl flex items-center justify-center shadow-glow-sm mb-3 group-hover:scale-110 transition-transform duration-300">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+
+    <!-- Skills Card -->
+    <div class="card card-hover animate-fade-in-up" style="text-align: center; animation-delay: 0.2s;">
+        <div style="width: 3rem; height: 3rem; margin: 0 auto; background: linear-gradient(135deg, var(--color-accent-purple), var(--color-accent-dark-purple)); border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(141, 159, 207, 0.25); margin-bottom: 1rem; transition: transform 0.3s ease;">
+            <svg style="width: 1.5rem; height: 1.5rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
         </div>
-        <div class="text-3xl font-extrabold text-navy mb-1">{{ stats.skills }}</div>
-        <p class="text-slate-600 mb-3">Skills</p>
-        <a href="{% url 'customadmin:skill_list' %}" class="btn-secondary text-sm !px-4 !py-1.5">Manage</a>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.5rem;">{{ stats.skills }}</div>
+        <p style="color: #696969; margin-bottom: 1rem;">Skills</p>
+        <a href="{% url 'customadmin:skill_list' %}" class="btn-secondary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">Manage</a>
     </div>
-    <div class="card p-6 text-center card-hover group animate-fade-in-up" style="animation-delay: 0.3s;">
-        <div class="w-12 h-12 mx-auto bg-gradient-to-br from-primary to-accent rounded-2xl flex items-center justify-center shadow-glow-sm mb-3 group-hover:scale-110 transition-transform duration-300">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+
+    <!-- Experiences Card -->
+    <div class="card card-hover animate-fade-in-up" style="text-align: center; animation-delay: 0.3s;">
+        <div style="width: 3rem; height: 3rem; margin: 0 auto; background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-dark-purple)); border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(201, 173, 183, 0.25); margin-bottom: 1rem; transition: transform 0.3s ease;">
+            <svg style="width: 1.5rem; height: 1.5rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
         </div>
-        <div class="text-3xl font-extrabold text-navy mb-1">{{ stats.experiences }}</div>
-        <p class="text-slate-600 mb-3">Experiences</p>
-        <a href="{% url 'customadmin:experience_list' %}" class="btn-secondary text-sm !px-4 !py-1.5">Manage</a>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.5rem;">{{ stats.experiences }}</div>
+        <p style="color: #696969; margin-bottom: 1rem;">Experiences</p>
+        <a href="{% url 'customadmin:experience_list' %}" class="btn-secondary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">Manage</a>
     </div>
-    <div class="card p-6 text-center hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 animate-fade-in-up" style="animation-delay: 0.4s;">
-        <div class="w-12 h-12 mx-auto bg-gradient-to-br from-secondary to-primary rounded-2xl flex items-center justify-center shadow-glow-sm mb-3 group-hover:scale-110 transition-transform duration-300">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+
+    <!-- Educations Card -->
+    <div class="card card-hover animate-fade-in-up" style="text-align: center; animation-delay: 0.4s;">
+        <div style="width: 3rem; height: 3rem; margin: 0 auto; background: linear-gradient(135deg, var(--color-accent-purple), var(--color-accent-rose)); border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(141, 159, 207, 0.25); margin-bottom: 1rem; transition: transform 0.3s ease;">
+            <svg style="width: 1.5rem; height: 1.5rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
         </div>
-        <div class="text-3xl font-extrabold text-navy mb-1">{{ stats.educations }}</div>
-        <p class="text-slate-600 mb-3">Educations</p>
-        <a href="{% url 'customadmin:education_list' %}" class="btn-secondary text-sm !px-4 !py-1.5">Manage</a>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.5rem;">{{ stats.educations }}</div>
+        <p style="color: #696969; margin-bottom: 1rem;">Educations</p>
+        <a href="{% url 'customadmin:education_list' %}" class="btn-secondary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">Manage</a>
     </div>
-    <div class="card p-6 text-center hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 {% if stats.unread_messages > 0 %}border-amber-200{% endif %} animate-fade-in-up" style="animation-delay: 0.5s;">
-        <div class="w-12 h-12 mx-auto bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center shadow-glow-sm mb-3 group-hover:scale-110 transition-transform duration-300">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+
+    <!-- Unread Messages Card -->
+    <div class="card card-hover animate-fade-in-up" style="text-align: center; animation-delay: 0.5s;">
+        <div style="width: 3rem; height: 3rem; margin: 0 auto; background: linear-gradient(135deg, #f59e0b, #f97316); border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25); margin-bottom: 1rem; transition: transform 0.3s ease;">
+            <svg style="width: 1.5rem; height: 1.5rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
         </div>
-        <div class="text-3xl font-extrabold text-navy mb-1">{{ stats.unread_messages }}</div>
-        <p class="text-slate-600 mb-3">Unread Messages</p>
-        <a href="{% url 'customadmin:message_list' %}" class="btn-secondary text-sm !px-4 !py-1.5">View</a>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.5rem;">{{ stats.unread_messages }}</div>
+        <p style="color: #696969; margin-bottom: 1rem;">Unread Messages</p>
+        <a href="{% url 'customadmin:message_list' %}" class="btn-secondary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">View</a>
     </div>
-    <div class="card p-6 text-center hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 animate-fade-in-up" style="animation-delay: 0.6s;">
-        <div class="w-12 h-12 mx-auto bg-gradient-to-br from-slate-700 to-slate-900 rounded-2xl flex items-center justify-center shadow-glow-sm mb-3 group-hover:scale-110 transition-transform duration-300">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+
+    <!-- Total Messages Card -->
+    <div class="card card-hover animate-fade-in-up" style="text-align: center; animation-delay: 0.6s;">
+        <div style="width: 3rem; height: 3rem; margin: 0 auto; background: linear-gradient(135deg, #4b5563, #283142); border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(75, 85, 99, 0.25); margin-bottom: 1rem; transition: transform 0.3s ease;">
+            <svg style="width: 1.5rem; height: 1.5rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
         </div>
-        <div class="text-3xl font-extrabold text-navy mb-1">{{ stats.total_messages }}</div>
-        <p class="text-slate-600 mb-3">Total Messages</p>
-        <a href="{% url 'customadmin:message_list' %}" class="btn-secondary text-sm !px-4 !py-1.5">View</a>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.5rem;">{{ stats.total_messages }}</div>
+        <p style="color: #696969; margin-bottom: 1rem;">Total Messages</p>
+        <a href="{% url 'customadmin:message_list' %}" class="btn-secondary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">View</a>
     </div>
 </div>
 
-<div class="card p-8 animate-fade-in-up" style="animation-delay: 0.7s;">
-    <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shadow-glow-sm">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h.01M17.657 6.343a1 1 0 010 1.414l-1.06 1.06a1 1 0 01-1.414 0 1 1 0 010-1.414l1.06-1.06a1 1 0 011.414 0zm-11.314 0a1 1 0 010 1.414l-1.06 1.06 1.414 1.414 1.06-1.06a1 1 0 000-1.414l-1.414-1.414z"/></svg>
+<!-- Quick Actions -->
+<div class="card animate-fade-in-up" style="animation-delay: 0.7s;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+        <div style="width: 2.5rem; height: 2.5rem; background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-purple)); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(201, 173, 183, 0.2);">
+            <svg style="width: 1.25rem; height: 1.25rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h.01M17.657 6.343a1 1 0 010 1.414l-1.06 1.06a1 1 0 01-1.414 0 1 1 0 010-1.414l1.06-1.06a1 1 0 011.414 0zm-11.314 0a1 1 0 010 1.414l-1.06 1.06 1.414 1.414 1.06-1.06a1 1 0 000-1.414l-1.414-1.414z"/></svg>
         </div>
-        <h2 class="text-xl font-bold text-navy">Quick Actions</h2>
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--color-text);">Quick Actions</h2>
     </div>
-    <div class="flex flex-wrap gap-4">
-        <a href="{% url 'customadmin:profile_add' %}" class="btn-primary !py-2">Add Profile</a>
-        <a href="{% url 'customadmin:project_add' %}" class="btn-primary !py-2">Add Project</a>
-        <a href="{% url 'customadmin:skill_add' %}" class="btn-primary !py-2">Add Skill</a>
-        <a href="{% url 'customadmin:experience_add' %}" class="btn-primary !py-2">Add Experience</a>
-        <a href="{% url 'customadmin:education_add' %}" class="btn-primary !py-2">Add Education</a>
+    <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+        <a href="{% url 'customadmin:profile_add' %}" class="btn" style="padding: 0.75rem 1.5rem; font-size: 0.875rem;">Add Profile</a>
+        <a href="{% url 'customadmin:project_add' %}" class="btn" style="padding: 0.75rem 1.5rem; font-size: 0.875rem;">Add Project</a>
+        <a href="{% url 'customadmin:skill_add' %}" class="btn" style="padding: 0.75rem 1.5rem; font-size: 0.875rem;">Add Skill</a>
+        <a href="{% url 'customadmin:experience_add' %}" class="btn" style="padding: 0.75rem 1.5rem; font-size: 0.875rem;">Add Experience</a>
+        <a href="{% url 'customadmin:education_add' %}" class="btn" style="padding: 0.75rem 1.5rem; font-size: 0.875rem;">Add Education</a>
     </div>
 </div>
 {% endblock %}

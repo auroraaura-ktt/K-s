@@ -14,10 +14,10 @@ class Profile(models.Model):
     email = models.EmailField()
     phone = models.CharField(max_length=20, blank=True)
     location = models.CharField(max_length=100, blank=True)
-    github = models.URLField(blank=True)
-    linkedin = models.URLField(blank=True)
-    twitter = models.URLField(blank=True)
-    website = models.URLField(blank=True)
+    github = models.CharField(max_length=300, blank=True)
+    linkedin = models.CharField(max_length=300, blank=True)
+    twitter = models.CharField(max_length=300, blank=True)
+    website = models.CharField(max_length=300, blank=True)
     resume = models.FileField(
         upload_to='resume/',
         blank=True,
@@ -27,6 +27,58 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class SocialLink(models.Model):
+    """Custom social link with configurable name and URL (shown on home hero)."""
+    name = models.CharField(max_length=50, help_text="e.g. GitHub, LinkedIn, Instagram, Email")
+    url = models.CharField(max_length=300, help_text="Full URL (or email address for mailto links)")
+    icon = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Optional Font Awesome class, e.g. 'fa-brands fa-instagram'. Auto-detected from name if blank.",
+    )
+    order = models.PositiveIntegerField(default=0, help_text="Display order (lower = first)")
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def href(self):
+        """Return a usable link: prefixes mailto: for bare email addresses."""
+        url = (self.url or '').strip()
+        if '@' in url and not url.lower().startswith(('http://', 'https://', 'mailto:')):
+            return f'mailto:{url}'
+        return url
+
+    @property
+    def icon_class(self):
+        """Explicit icon if set, otherwise auto-detect from the name."""
+        if self.icon:
+            return self.icon
+        name = (self.name or '').lower()
+        url = (self.url or '').lower()
+        if 'github' in name or 'github.com' in url:
+            return 'fa-brands fa-github'
+        if 'linkedin' in name or 'linkedin.com' in url:
+            return 'fa-brands fa-linkedin-in'
+        if 'instagram' in name or 'instagram.com' in url:
+            return 'fa-brands fa-instagram'
+        if 'tiktok' in name or 'tiktok.com' in url:
+            return 'fa-brands fa-tiktok'
+        if 'youtube' in name or 'youtube.com' in url:
+            return 'fa-brands fa-youtube'
+        if 'facebook' in name or 'facebook.com' in url:
+            return 'fa-brands fa-facebook'
+        if 'twitter' in name or name == 'x' or 'x.com' in url:
+            return 'fa-brands fa-x-twitter'
+        if 'email' in name or 'mail' in name:
+            return 'fa-regular fa-envelope'
+        return 'fa-solid fa-link'
 
 
 class Project(models.Model):
@@ -86,6 +138,12 @@ class Education(models.Model):
     start_date = models.DateField()
     end_date = models.DateField(blank=True, null=True)
     description = models.TextField(blank=True)
+    certificate = models.FileField(
+        upload_to='certificates/',
+        blank=True,
+        null=True,
+        help_text="Certificate file (PDF or image) for this degree/program",
+    )
 
     def __str__(self):
         return f"{self.degree} at {self.institution}"

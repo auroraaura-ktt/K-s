@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 
-from .models import Project, Profile, Skill, Experience, Education, ContactMessage, Album
+from .models import Project, Profile, Skill, Experience, Education, ContactMessage, Album, SocialLink
 from .forms import ContactForm
 
 
@@ -16,7 +16,13 @@ def get_active_profile():
 def home(request):
     """Home / landing page with hero section."""
     profile = get_active_profile()
-    return render(request, 'home.html', {'profile': profile})
+    projects = Project.objects.all().order_by('-date_created')[:6]
+    social_links = SocialLink.objects.filter(is_active=True)
+    return render(request, 'home.html', {
+        'profile': profile,
+        'projects': projects,
+        'social_links': social_links,
+    })
 
 
 def about(request):
@@ -29,6 +35,16 @@ def about(request):
         'profile': profile,
         'skills': skills,
         'experiences': experiences,
+        'educations': educations,
+    })
+
+
+def education(request):
+    """Education page with degrees and certificates."""
+    profile = get_active_profile()
+    educations = Education.objects.all().order_by('-start_date')
+    return render(request, 'education.html', {
+        'profile': profile,
         'educations': educations,
     })
 
@@ -69,9 +85,25 @@ def project_detail(request, project_id):
     """Single project detail page."""
     profile = get_active_profile()
     project = get_object_or_404(Project, id=project_id)
+
+    # Order every project most-recent-first so we can build prev/next
+    # navigation and a "More Projects" section around the current one.
+    ordered = list(Project.objects.order_by('-date_created', '-id'))
+    try:
+        index = next(i for i, p in enumerate(ordered) if p.id == project.id)
+    except StopIteration:
+        index = -1
+
+    prev_project = ordered[index - 1] if 0 < index < len(ordered) else None
+    next_project = ordered[index + 1] if 0 <= index < len(ordered) - 1 else None
+    more_projects = [p for p in ordered if p.id != project.id][:4]
+
     return render(request, 'project_detail.html', {
         'profile': profile,
         'project': project,
+        'prev_project': prev_project,
+        'next_project': next_project,
+        'more_projects': more_projects,
     })
 
 

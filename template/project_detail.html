@@ -1,77 +1,138 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 
-{% block title %}{{ project.title }} - My Portfolio{% endblock %}
+{% block title %}{{ project.title }} - Kay Tii Tii{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto animate-fade-in-up">
-    <div class="card overflow-hidden">
-        <div class="relative">
+<section class="section">
+    <div class="page-wrap" style="max-width: 1200px;">
+
+        <div class="glass-container split-detail">
+
+            <!-- PHOTO (half) -->
             {% if project.photo %}
-            <img src="{{ project.photo.url }}" class="w-full h-72 md:h-96 object-cover" alt="{{ project.title }}">
+            <div class="split-media">
+                <img src="{{ project.photo.url }}" class="detail-image" alt="{{ project.title }}">
+            </div>
             {% else %}
-            <div class="w-full h-72 md:h-96 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
-                <svg class="w-16 h-16 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
+            <div class="split-media">
+                <div class="detail-placeholder">No Image</div>
             </div>
             {% endif %}
-            {% if project.is_featured %}
-            <div class="absolute top-4 right-4">
-                <span class="badge-featured !px-4 !py-2">Featured</span>
+
+            <!-- TEXT (half) -->
+            <div class="split-content">
+                {% if project.is_featured %}
+                <span class="badge-cyan" style="margin-bottom: 12px; display: inline-block;">Featured</span>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                <div class="hero-buttons" style="margin: 0 0 18px; gap: 10px;">
+                    <a href="{% url 'customadmin:project_edit' project.id %}" class="outline-btn" style="padding: 10px 16px;">
+                        <i class="fa-solid fa-pen"></i> Edit
+                    </a>
+                    <a href="{% url 'customadmin:project_delete' project.id %}" class="outline-btn" style="padding: 10px 16px; border-color: #ff6b7a;" onclick="return confirm('Are you sure?')">
+                        <i class="fa-solid fa-trash"></i> Delete
+                    </a>
+                </div>
+                {% endif %}
+
+                <p class="page-label">Project</p>
+                <h1 class="page-title">{{ project.title }}<span>.</span></h1>
+                <p class="page-sub" style="margin-bottom: 20px;">{{ project.description }}</p>
+
+                {% if project.url or project.github_url %}
+                <div class="hero-buttons" style="margin-bottom: 10px;">
+                    {% if project.url %}
+                    <a href="{{ project.url }}" target="_blank" class="primary-btn">
+                        Live Demo
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                    {% endif %}
+                    {% if project.github_url %}
+                    <a href="{{ project.github_url }}" target="_blank" class="secondary-btn">
+                        <i class="fa-brands fa-github"></i> GitHub
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <div class="meta-row">
+                    <span>
+                        <i class="fa-regular fa-calendar" style="color: var(--cyan); margin-right: 6px;"></i>
+                        Created: {{ project.date_created|date:"M d, Y" }}
+                    </span>
+                    <a href="{% url 'projects' %}" class="secondary-btn" style="padding: 10px 18px;">
+                        <i class="fa-solid fa-arrow-left"></i> Back to Projects
+                    </a>
+                </div>
             </div>
-            {% endif %}
+
         </div>
-
-        <div class="p-8">
-            {% if user.is_authenticated %}
-            <div class="flex space-x-3 mb-6">
-                <a href="{% url 'customadmin:project_edit' project.id %}" class="btn-secondary text-sm">Edit Project</a>
-                <a href="{% url 'customadmin:project_delete' project.id %}" class="bg-red-500 text-white px-4 py-2 rounded-xl text-sm hover:bg-red-600 transition-colors shadow-glow-sm">Delete Project</a>
-            </div>
-            {% endif %}
-
-            <h2 class="text-3xl md:text-4xl font-extrabold text-navy mb-4 bg-gradient-to-r from-navy via-primary to-secondary bg-clip-text text-transparent">{{ project.title }}</h2>
-            <p class="text-slate-600 mb-8 leading-relaxed text-lg">{{ project.description }}</p>
-
-            {% if project.url or project.github_url %}
-            <div class="flex flex-wrap gap-4 mb-8">
-                {% if project.url %}
-                <a href="{{ project.url }}" target="_blank" class="btn-primary">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                    </svg>
-                    Live Demo
-                </a>
-                {% endif %}
-                {% if project.github_url %}
-                <a href="{{ project.github_url }}" target="_blank" class="btn-secondary">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12c6.627 0 12-5.373 12-12S18.627 0 12 0zm-2 16v-6h-2v6H6v-8h4v2h2v-2h4v8h-2z"/>
-                    </svg>
-                    View on GitHub
-                </a>
-                {% endif %}
-            </div>
-            {% endif %}
-
-            <div class="flex justify-between items-center text-sm text-slate-500 pt-6 border-t border-slate-100">
-                <span class="inline-flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    Created: {{ project.date_created|date:"M d, Y" }}
+<!-- Prev / Next project navigation -->
+        {% if prev_project or next_project %}
+        <div class="detail-nav">
+            {% if prev_project %}
+            <a href="{% url 'project_detail' prev_project.id %}" class="secondary-btn detail-nav-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>
+                    <em>Previous</em>
+                    {{ prev_project.title|truncatechars:30 }}
                 </span>
-            </div>
+            </a>
+            {% else %}
+            <span></span>
+            {% endif %}
 
-            <div class="mt-8">
-                <a href="{% url 'projects' %}" class="btn-secondary">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
-                    Back to Projects
+            {% if next_project %}
+            <a href="{% url 'project_detail' next_project.id %}" class="secondary-btn detail-nav-btn">
+                <span>
+                    <em>Next</em>
+                    {{ next_project.title|truncatechars:30 }}
+                </span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- More projects -->
+        {% if more_projects %}
+        <div style="margin-top: 60px;">
+            <div class="page-head">
+                <h2>More Projects<span>.</span></h2>
+                <a href="{% url 'projects' %}" class="outline-btn">
+                    View All Projects
+                    <i class="fa-solid fa-arrow-right"></i>
                 </a>
             </div>
+
+            <div class="projects-grid" style="grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));">
+                {% for item in more_projects %}
+                <a class="project-card" href="{% url 'project_detail' item.id %}" aria-label="View {{ item.title }}">
+                    <div class="project-image">
+                        {% if item.photo %}
+                        <img src="{{ item.photo.url }}" alt="{{ item.title }}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                        <div class="detail-placeholder" style="height: 165px;">No Image</div>
+                        {% endif %}
+                        {% if item.is_featured %}
+                        <div style="position: absolute; top: 10px; right: 10px;"><span class="badge-cyan">Featured</span></div>
+                        {% endif %}
+                    </div>
+                    <div class="project-info">
+                        <h3>{{ item.title }}</h3>
+                        <p>{{ item.description|truncatechars:100 }}</p>
+                        <div class="project-bottom">
+                            <span>{{ item.date_created|date:"M d, Y" }}</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
         </div>
+        {% endif %}
+
     </div>
-</div>
+</section>
 {% endblock %}

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Portfolio Reference</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: #d4d4d6;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #383838;
+    padding: 4vw;
+  }
+
+  .portfolio {
+    width: min(1500px, 100%);
+    margin: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 42px 78px;
+  }
+
+  .slide {
+    position: relative;
+    aspect-ratio: 1.58 / 1;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 12px 12px rgba(0,0,0,.10);
+  }
+
+  .slide::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.5);
+  }
+
+  .frame {
+    position: absolute;
+    inset: 4%;
+    border: 2px solid #c8bdc4;
+  }
+
+  .gradient {
+    background: linear-gradient(135deg, #cdb5bd 0%, #c8bdd1 48%, #8d9fcf 100%);
+  }
+
+  .gradient.soft {
+    background: linear-gradient(135deg, #cbb2bb, #e2dce4 52%, #a3b0d7);
+  }
+
+  .black-bars {
+    position: absolute;
+    display: flex;
+    gap: 5px;
+    align-items: end;
+  }
+  .black-bars span {
+    display: block;
+    width: 8px;
+    height: 20px;
+    background: #3c3c3c;
+  }
+  .black-bars span:last-child { width: 46px; }
+
+  .title {
+    font-size: clamp(22px, 2.35vw, 39px);
+    line-height: 1.08;
+    font-weight: 800;
+    letter-spacing: -1px;
+    text-transform: uppercase;
+  }
+
+  .small {
+    font-size: clamp(7px, .58vw, 10px);
+    line-height: 1.45;
+    font-weight: 500;
+  }
+
+  .label {
+    font-size: 7px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .photo {
+    position: absolute;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* Unsplash source images used as visual stand-ins for the reference mockup. */
+  .desk {
+    background-image: url("https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=900&q=85");
+  }
+  .laptop {
+    background-image: url("https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=900&q=85");
+  }
+  .plant {
+    background-image: url("https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=85");
+  }
+
+  /* 01 - Cover */
+  .cover .frame { inset: 4%; }
+  .cover .accent {
+    position: absolute;
+    left: 15%;
+    top: 21%;
+    width: 14px;
+    height: 44%;
+    background: linear-gradient(#c9adb7, #7f92c7);
+  }
+  .cover .title {
+    position: absolute;
+    left: 26%;
+    top: 29%;
+  }
+  .cover .small {
+    position: absolute;
+    left: 26%;
+    top: 55%;
+    width: 40%;
+  }
+  .cover .black-bars {
+    right: 7%;
+    bottom: 9%;
+  }
+
+  /* 02 - About */
+  .about .gradient-box {
+    position: absolute;
+    left: 3%;
+    top: 3%;
+    width: 54%;
+    height: 94%;
+  }
+  .about .inner-frame {
+    position: absolute;
+    left: 10%;
+    bottom: 3%;
+    width: 40%;
+    height: 45%;
+    border: 2px solid white;
+  }
+  .about .title {
+    position: absolute;
+    left: 16%;
+    bottom: 25%;
+    color: white;
+    text-align: center;
+    width: 31%;
+  }
+  .about .small {
+    position: absolute;
+    left: 16%;
+    bottom: 8%;
+    width: 31%;
+    color: white;
+    text-align: center;
+  }
+  .about .photo.a { right: 3%; top: 3%; width: 43%; height: 35%; }
+  .about .photo.b { right: 3%; bottom: 3%; width: 43%; height: 51%; }
+  .about .white-bars {
+    position: absolute; left: 5%; top: 6%; display:flex; gap:4px;
+  }
+  .about .white-bars span { width: 38px; height: 8px; background:white; }
+  .about .white-bars span:not(:first-child) { width: 8px; }
+
+  /* 03 - Style */
+  .style .photo.a { left: 5%; top: 16%; width: 31%; height: 43%; }
+  .style .photo.b { left: 38%; top: 16%; width: 30%; height: 43%; }
+  .style .photo.c { right: 6%; top: 16%; width: 30%; height: 43%; }
+  .style .gradient-box {
+    position: absolute; right: 6%; bottom: 9%; width: 29%; height: 25%;
+  }
+  .style .accent {
+    position:absolute; right: 3%; top: 9%; width: 23%; height: 15%;
+    background:#c9b0b8;
+  }
+  .style .title { position:absolute; left: 9%; bottom: 20%; font-size: clamp(18px,2vw,31px); }
+  .style .small { position:absolute; left:9%; bottom: 10%; width: 55%; }
+  .style .black-bars { right: 3%; bottom: 6%; }
+
+  /* 04 - Creative */
+  .creative .photo {
+    left: 5%; top: 5%; width: 54%; height: 90%;
+  }
+  .creative .gradient-box {
+    position:absolute; right: 19%; top: 3%; width: 39%; height: 94%;
+    background:linear-gradient(135deg,#cbb1ba,#d6d3de 60%,#9ba9d4);
+  }
+  .creative .title {
+    position:absolute; right: 9%; top: 32%; width: 38%;
+    z-index:2;
+  }
+  .creative .small {
+    position:absolute; right: 9%; top: 55%; width: 36%; z-index:2;
+  }
+  .creative .black-bars { right: 0; bottom: 7%; }
+
+  /* 05 - Graphic Studio */
+  .studio .photo.a { left: 3%; bottom: 5%; width: 32%; height: 58%; }
+  .studio .photo.b { right: 3%; top: 5%; width: 35%; height: 58%; }
+  .studio .gradient-box.a { position:absolute; left:3%; top:0; width:32%; height:22%; }
+  .studio .gradient-box.b { position:absolute; right:3%; bottom:0; width:29%; height:25%; }
+  .studio .title {
+    position:absolute; left: 30%; top: 35%; width: 54%; text-align:center;
+    z-index:2;
+  }
+  .studio .small {
+    position:absolute; left: 32%; top: 62%; width: 45%; text-align:center;
+  }
+
+  /* 06 - Graphic Design */
+  .graphic .photo.a { right: 5%; top: 3%; width: 30%; height: 44%; }
+  .graphic .photo.b { left: 10%; bottom: 10%; width: 48%; height: 38%; }
+  .graphic .photo.c { right: 7%; bottom: 29%; width: 29%; height: 36%; }
+  .graphic .gradient-box {
+    position:absolute; left: 30%; top: 7%; width: 39%; height: 22%;
+    background:#c7afb8;
+  }
+  .graphic .title { position:absolute; left: 8%; top: 17%; font-size: clamp(18px,2vw,31px); z-index:2; }
+  .graphic .small { position:absolute; left: 8%; top: 34%; width: 52%; z-index:2; }
+  .graphic .side-gradient {
+    position:absolute; right:0; top: 7%; width: 4%; height: 41%;
+    background:linear-gradient(#c8b0bb,#9aaad2);
+  }
+  .graphic .vertical-label {
+    position:absolute; left:7%; bottom:13%; font-size:6px;
+    writing-mode:vertical-rl; transform:rotate(180deg); letter-spacing:.6px;
+  }
+  .graphic .black-bars { right: 0; bottom: 7%; }
+
+  /* 07 - Gallery */
+  .gallery .frame { inset: 4%; }
+  .gallery .photo.a { left: 8%; top: 12%; width: 40%; height: 70%; }
+  .gallery .photo.b { left: 50%; top: 12%; width: 38%; height: 34%; }
+  .gallery .photo.c { left: 50%; top: 50%; width: 38%; height: 32%; }
+  .gallery .vertical-left, .gallery .vertical-right {
+    position:absolute; font-size:6px; letter-spacing:.5px;
+    writing-mode:vertical-rl; transform:rotate(180deg);
+  }
+  .gallery .vertical-left { left:6%; bottom:15%; }
+  .gallery .vertical-right { right:5%; top:15%; }
+
+  /* 08 - Numbers */
+  .numbers .gradient-strip {
+    position:absolute; left:0; top:0; width:22%; height:100%;
+    background:linear-gradient(#cdb3bc,#c9bdce 50%,#98a9d5);
+  }
+  .numbers .thumb { left: 8%; width: 15%; height: 17%; }
+  .numbers .thumb.t1 { top: 9%; }
+  .numbers .thumb.t2 { top: 38%; }
+  .numbers .thumb.t3 { top: 67%; }
+  .numbers .num {
+    position:absolute; left:29%; font-size:22px; font-weight:800;
+  }
+  .numbers .n1 { top:13%; }
+  .numbers .n2 { top:42%; }
+  .numbers .n3 { top:71%; }
+  .numbers .copy {
+    position:absolute; left:40%; width:46%; font-size:7px; line-height:1.45;
+  }
+  .numbers .c1 { top:13%; }
+  .numbers .c2 { top:42%; }
+  .numbers .c3 { top:71%; }
+  .numbers .rule {
+    position:absolute; left:34%; width:2px; height:25px; background:#c8b2bb;
+  }
+  .numbers .r1 { top:14%; } .numbers .r2 { top:43%; } .numbers .r3 { top:72%; }
+  .numbers .black-bar {
+    position:absolute; right:0; top:14%; width:6%; height:55%; background:#3d3d3d;
+  }
+
+  /* 09 - Thank You */
+  .thank .gradient-box {
+    position:absolute; left:0; top:12%; width:43%; height:62%;
+    background:linear-gradient(135deg,#c9b0b9,#d5c8d3 50%,#9eadd3);
+  }
+  .thank .frame {
+    left: 15%; top: 31%; width: 63%; height: 48%;
+    border-color:#b9b4c7;
+  }
+  .thank .title {
+    position:absolute; left: 43%; top: 37%; width: 35%;
+  }
+  .thank .small { position:absolute; left: 43%; top: 63%; }
+  .thank .vertical-label {
+    position:absolute; right: 2%; top: 8%; font-size:6px;
+    writing-mode:vertical-rl; transform:rotate(180deg);
+  }
+  .thank .black-bars { right:0; bottom:7%; }
+
+  @media (max-width: 950px) {
+    body { padding: 24px; }
+    .portfolio { grid-template-columns: repeat(2, 1fr); gap: 28px; }
+  }
+
+  @media (max-width: 600px) {
+    .portfolio { grid-template-columns: 1fr; }
+    .slide { aspect-ratio: 1.58 / 1; }
+  }
+</style>
+</head>
+<body>
+
+<main class="portfolio">
+
+  <section class="slide cover">
+    <div class="frame"></div>
+    <div class="accent"></div>
+    <div class="title">Design<br>Portfolio</div>
+    <div class="small">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</div>
+    <div class="black-bars"><span></span><span></span><span></span></div>
+  </section>
+
+  <section class="slide about">
+    <div class="gradient-box gradient"></div>
+    <div class="inner-frame"></div>
+    <div class="title">About<br>Design</div>
+    <div class="small">Lorem ipsum dolor sit amet,<br>consectetur adipiscing elit, sed diam<br>nonummy nibh euismod tincidunt ut laoreet.</div>
+    <div class="photo a desk"></div>
+    <div class="photo b laptop"></div>
+    <div class="white-bars"><span></span><span></span><span></span></div>
+  </section>
+
+  <section class="slide style">
+    <div class="photo a desk"></div>
+    <div class="photo b laptop"></div>
+    <div class="photo c plant"></div>
+    <div class="accent"></div>
+    <div class="gradient-box gradient"></div>
+    <div class="title">Style Design</div>
+    <div class="small">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed diam<br>nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam.</div>
+    <div class="black-bars"><span></span><span></span><span></span></div>
+  </section>
+
+  <section class="slide creative">
+    <div class="photo desk"></div>
+    <div class="gradient-box"></div>
+    <div class="title">Design<br>Creative</div>
+    <div class="small">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat.</div>
+    <div class="label" style="position:absolute;left:6%;bottom:7%;">Graphic Design Portfolio</div>
+    <div class="black-bars"><span></span><span></span><span></span></div>
+  </section>
+
+  <section class="slide studio">
+    <div class="gradient-box a gradient"></div>
+    <div class="gradient-box b gradient"></div>
+    <div class="photo a laptop"></div>
+    <div class="photo b desk"></div>
+    <div class="title">Graphic<br>Studio</div>
+    <div class="small">Lorem ipsum dolor sit amet, consectetur adipiscing elit,<br>sed diam nonummy nibh euismod tincidunt ut laoreet.</div>
+  </section>
+
+  <section class="slide graphic">
+    <div class="gradient-box"></div>
+    <div class="side-gradient"></div>
+    <div class="photo a laptop"></div>
+    <div class="photo b desk"></div>
+    <div class="photo c plant"></div>
+    <div class="title">Graphic Design</div>
+    <div class="small">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed diam<br>nonummy nibh euismod tincidunt ut laoreet dolore magna.</div>
+    <div class="vertical-label">Graphic Design Portfolio</div>
+    <div class="black-bars"><span></span><span></span><span></span></div>
+  </section>
+
+  <section class="slide gallery">
+    <div class="frame"></div>
+    <div class="photo a desk"></div>
+    <div class="photo b laptop"></div>
+    <div class="photo c desk"></div>
+    <div class="vertical-left">Graphic Design Portfolio</div>
+    <div class="vertical-right">Graphic Design Portfolio</div>
+  </section>
+
+  <section class="slide numbers">
+    <div class="gradient-strip"></div>
+    <div class="photo thumb t1 laptop"></div>
+    <div class="photo thumb t2 desk"></div>
+    <div class="photo thumb t3 laptop"></div>
+    <div class="num n1">1.</div>
+    <div class="num n2">2.</div>
+    <div class="num n3">3.</div>
+    <div class="rule r1"></div>
+    <div class="rule r2"></div>
+    <div class="rule r3"></div>
+    <div class="copy c1">Lorem ipsum dolor sit amet, consectetur adipiscing elit,<br>sed diam nonummy nibh euismod tincidunt ut laoreet<br>dolore magna aliquam erat volutpat.</div>
+    <div class="copy c2">Lorem ipsum dolor sit amet, consectetur adipiscing elit,<br>sed diam nonummy nibh euismod tincidunt ut laoreet<br>dolore magna aliquam erat volutpat.</div>
+    <div class="copy c3">Lorem ipsum dolor sit amet, consectetur adipiscing elit,<br>sed diam nonummy nibh euismod tincidunt ut laoreet<br>dolore magna aliquam erat volutpat.</div>
+    <div class="black-bar"></div>
+  </section>
+
+  <section class="slide thank">
+    <div class="gradient-box"></div>
+    <div class="frame"></div>
+    <div class="title">Thank<br>You</div>
+    <div class="small">Lorem ipsum dolor sit amet,</div>
+    <div class="vertical-label">Graphic Design Portfolio</div>
+    <div class="black-bars"><span></span><span></span><span></span></div>
+  </section>
+
+</main>
+</body>
+</html>

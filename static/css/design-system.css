@@ -1,0 +1,835 @@
+/* ============================================
+   DESIGN SYSTEM - Portfolio Design Theme
+   Based on index(1).html reference design
+   ============================================ */
+
+:root {
+    /* Primary Colors */
+    --color-bg: #d4d4d6;
+    --color-text: #383838;
+    --color-white: #ffffff;
+    --color-border: #c8bdc4;
+    
+    /* Gradient Colors */
+    --color-accent-rose: #c9adb7;
+    --color-accent-purple: #8d9fcf;
+    --color-accent-dark-purple: #7f92c7;
+    --color-grad-1: #cdb5bd;
+    --color-grad-2: #c8bdd1;
+    --color-grad-3: #8d9fcf;
+    --color-grad-soft-1: #cbb2bb;
+    --color-grad-soft-2: #e2dce4;
+    --color-grad-soft-3: #a3b0d7;
+    
+    /* Dark Bars */
+    --color-dark-bar: #3c3c3c;
+    
+    /* Typography */
+    --font-primary: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-secondary: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--color-bg);
+    font-family: var(--font-secondary);
+    color: var(--color-text);
+    line-height: 1.6;
+}
+
+/* ============================================
+   GRADIENT DEFINITIONS
+   ============================================ */
+
+.gradient-primary {
+    background: linear-gradient(135deg, var(--color-grad-1) 0%, var(--color-grad-2) 48%, var(--color-grad-3) 100%);
+}
+
+.gradient-soft {
+    background: linear-gradient(135deg, var(--color-grad-soft-1), var(--color-grad-soft-2) 52%, var(--color-grad-soft-3));
+}
+
+.gradient-rose-purple {
+    background: linear-gradient(135deg, var(--color-accent-rose) 0%, var(--color-accent-purple) 100%);
+}
+
+.gradient-vertical {
+    background: linear-gradient(to bottom, var(--color-grad-1), var(--color-accent-dark-purple));
+}
+
+/* ============================================
+   HEADER / NAVBAR
+   ============================================ */
+
+header {
+    background-color: var(--color-white);
+    border-bottom: 1px solid rgba(200, 189, 196, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+}
+
+.logo-section:hover {
+    transform: scale(1.02);
+}
+
+.logo-box {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 8px;
+    border: 2px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to bottom right, var(--color-accent-rose), var(--color-accent-purple));
+    box-shadow: 0 4px 12px rgba(201, 173, 183, 0.2);
+}
+
+.logo-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 4px;
+}
+
+.site-name {
+    color: var(--color-text);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
+}
+
+nav a {
+    text-decoration: none;
+    color: var(--color-text);
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: color 0.3s ease;
+}
+
+nav a:hover {
+    color: var(--color-accent-rose);
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.btn-admin {
+    background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-purple));
+    color: var(--color-white);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(201, 173, 183, 0.25);
+}
+
+.btn-admin:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(201, 173, 183, 0.35);
+}
+
+/* ============================================
+   MAIN CONTENT AREA
+   ============================================ */
+
+main {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 2.5rem 1rem;
+    flex-grow: 1;
+}
+
+.container {
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* ============================================
+   CARD & FRAME STYLES
+   ============================================ */
+
+.card {
+    background: var(--color-white);
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.frame {
+    border: 2px solid var(--color-border);
+    padding: 2%;
+    border-radius: 4px;
+}
+
+.frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+    border-radius: 4px;
+}
+
+/* ============================================
+   DECORATIVE ELEMENTS
+   ============================================ */
+
+.black-bars {
+    display: flex;
+    gap: 5px;
+    align-items: flex-end;
+}
+
+.black-bars span {
+    display: block;
+    width: 8px;
+    height: 20px;
+    background: var(--color-dark-bar);
+    border-radius: 2px;
+}
+
+.black-bars span:last-child {
+    width: 46px;
+}
+
+.accent-bar {
+    width: 14px;
+    height: 44%;
+    background: linear-gradient(to bottom, var(--color-accent-rose), var(--color-accent-dark-purple));
+    border-radius: 2px;
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-primary);
+    color: var(--color-text);
+    font-weight: 800;
+    letter-spacing: -1px;
+    text-transform: capitalize;
+    line-height: 1.08;
+}
+
+h1 {
+    font-size: clamp(28px, 3.5vw, 48px);
+}
+
+h2 {
+    font-size: clamp(24px, 3vw, 42px);
+}
+
+h3 {
+    font-size: clamp(20px, 2.5vw, 36px);
+}
+
+h4, h5, h6 {
+    font-size: clamp(16px, 2vw, 28px);
+}
+
+.title {
+    font-size: clamp(22px, 2.35vw, 39px);
+    line-height: 1.08;
+    font-weight: 800;
+    letter-spacing: -1px;
+    text-transform: capitalize;
+}
+
+.subtitle {
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-text);
+}
+
+.description {
+    font-size: clamp(7px, 0.58vw, 10px);
+    line-height: 1.45;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.label {
+    font-size: 7px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-text);
+}
+
+p {
+    color: var(--color-text);
+    line-height: 1.6;
+}
+
+/* ============================================
+   BUTTONS & INTERACTIVE ELEMENTS
+   ============================================ */
+
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-purple));
+    color: var(--color-white);
+    text-decoration: none;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(201, 173, 183, 0.25);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(201, 173, 183, 0.35);
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-purple));
+    color: var(--color-white);
+    text-decoration: none;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(201, 173, 183, 0.25);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(201, 173, 183, 0.35);
+}
+
+.btn-gradient {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-purple));
+    color: var(--color-white);
+    text-decoration: none;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(201, 173, 183, 0.25);
+}
+
+.btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(201, 173, 183, 0.35);
+}
+
+.btn-secondary {
+    background: var(--color-white);
+    color: var(--color-text);
+    border: 2px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+    background: var(--color-bg);
+    border-color: var(--color-accent-rose);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--color-text);
+    border: 2px solid var(--color-border);
+}
+
+.btn-outline:hover {
+    background: var(--color-bg);
+    border-color: var(--color-accent-rose);
+}
+
+/* ============================================
+   FORMS & INPUTS
+   ============================================ */
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="tel"],
+textarea,
+select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    font-family: var(--font-secondary);
+    color: var(--color-text);
+    background-color: var(--color-white);
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="tel"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--color-accent-rose);
+    box-shadow: 0 0 0 3px rgba(201, 173, 183, 0.1);
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+
+footer {
+    border-top: 1px solid rgba(200, 189, 196, 0.3);
+    background: linear-gradient(180deg, var(--color-white), #f5f5f5);
+    padding: 2rem 1rem;
+    margin-top: 4rem;
+}
+
+footer a {
+    color: var(--color-accent-rose);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--color-text);
+}
+
+footer p {
+    color: rgba(201, 173, 183, 0.7);
+    font-size: 0.875rem;
+}
+
+/* ============================================
+   LAYOUT GRIDS
+   ============================================ */
+
+.grid {
+    display: grid;
+    gap: 2rem;
+}
+
+.grid-2 {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.grid-4 {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-uppercase {
+    text-transform: uppercase;
+}
+
+.text-bold {
+    font-weight: 700;
+}
+
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+
+.px-1 { padding-left: 0.5rem; padding-right: 0.5rem; }
+.px-2 { padding-left: 1rem; padding-right: 1rem; }
+.px-3 { padding-left: 1.5rem; padding-right: 1.5rem; }
+.px-4 { padding-left: 2rem; padding-right: 2rem; }
+
+.py-1 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+.py-2 { padding-top: 1rem; padding-bottom: 1rem; }
+.py-3 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+.py-4 { padding-top: 2rem; padding-bottom: 2rem; }
+
+.shadow-card {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.rounded {
+    border-radius: 8px;
+}
+
+.border {
+    border: 2px solid var(--color-border);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+
+@media (max-width: 950px) {
+    nav {
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .nav-links {
+        gap: 1rem;
+        width: 100%;
+        order: 3;
+    }
+
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    nav {
+        padding: 1rem 0;
+    }
+
+    .logo-section {
+        gap: 0.5rem;
+    }
+
+    .site-name {
+        font-size: 1rem;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .title {
+        font-size: 1.5rem;
+    }
+
+    main {
+        padding: 1rem;
+    }
+
+    .card {
+        padding: 1rem;
+    }
+
+    .grid-2,
+    .grid-3,
+    .grid-4 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slide-up {
+    animation: slideUp 0.5s ease-in-out;
+}
+
+/* ============================================
+   ADMIN PANEL SPECIFIC
+   ============================================ */
+
+.admin-header {
+    background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-purple));
+    color: var(--color-white);
+    box-shadow: 0 4px 12px rgba(201, 173, 183, 0.25);
+    position: relative;
+    z-index: 100;
+}
+
+.admin-header h1,
+.admin-header h2,
+.admin-header h3 {
+    color: var(--color-white);
+}
+
+.admin-header nav {
+    max-width: 100%;
+}
+
+.admin-sidebar {
+    background: var(--color-white);
+    border-right: 2px solid var(--color-border);
+    min-height: calc(100vh - 4rem);
+    width: 16rem;
+    flex-shrink: 0;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.admin-sidebar nav {
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    color: var(--color-text);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin: 0.25rem 0.75rem;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    position: relative;
+    border: 2px solid transparent;
+}
+
+.sidebar-link svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.sidebar-link:hover {
+    background: linear-gradient(135deg, rgba(201, 173, 183, 0.1), rgba(141, 159, 207, 0.1));
+    color: var(--color-accent-rose);
+    border-color: rgba(201, 173, 183, 0.3);
+    transform: translateX(4px);
+}
+
+.sidebar-link:hover svg {
+    color: var(--color-accent-rose);
+}
+
+.sidebar-link.active {
+    background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-purple));
+    color: var(--color-white);
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(201, 173, 183, 0.3);
+}
+
+.sidebar-link.active svg {
+    color: var(--color-white);
+}
+
+.sidebar-link.active:hover {
+    transform: translateX(0);
+    color: var(--color-white);
+}
+
+.sidebar-link.active:hover svg {
+    color: var(--color-white);
+}
+
+/* Admin main content area - override the global main styles */
+.admin-main {
+    flex-grow: 1;
+    padding: 2rem;
+    max-width: 100%;
+    margin: 0;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-white);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.admin-table thead {
+    background: linear-gradient(135deg, var(--color-accent-rose), var(--color-accent-purple));
+    color: var(--color-white);
+}
+
+.admin-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
+}
+
+.admin-table td {
+    padding: 1rem;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-text);
+}
+
+.admin-table tbody tr:hover {
+    background-color: rgba(201, 173, 183, 0.05);
+}
+
+.admin-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-success {
+    background: rgba(76, 175, 80, 0.1);
+    border-left: 4px solid #4CAF50;
+    padding: 1rem;
+    border-radius: 4px;
+    color: #2e7d32;
+    font-weight: 500;
+}
+
+.form-error {
+    background: rgba(244, 67, 54, 0.1);
+    border-left: 4px solid #f44336;
+    padding: 1rem;
+    border-radius: 4px;
+    color: #c62828;
+    font-weight: 500;
+}
+
+.form-info {
+    background: rgba(33, 150, 243, 0.1);
+    border-left: 4px solid #2196F3;
+    padding: 1rem;
+    border-radius: 4px;
+    color: #1565c0;
+    font-weight: 500;
+}
+
+/* Admin responsive */
+@media (max-width: 768px) {
+    .admin-sidebar {
+        width: 100%;
+        min-height: auto;
+        border-right: none;
+        border-bottom: 2px solid var(--color-border);
+    }
+
+    .admin-sidebar nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 0.5rem;
+    }
+
+    .sidebar-link {
+        margin: 0.25rem;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .sidebar-link svg {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .admin-main {
+        padding: 1rem;
+    }
+}
