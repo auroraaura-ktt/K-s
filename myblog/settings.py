@@ -35,6 +35,18 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = Path('/tmp/media') if is_serverless_runtime() else BASE_DIR / 'media'
 MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 
+# Use Cloudinary for persistent media storage in production (Vercel) when its
+# credentials are provided via environment variables. Local development keeps
+# using the filesystem so existing local behavior is unchanged.
+_USE_CLOUDINARY = all(
+    os.environ.get(key)
+    for key in (
+        'CLOUDINARY_CLOUD_NAME',
+        'CLOUDINARY_API_KEY',
+        'CLOUDINARY_API_SECRET',
+    )
+)
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -65,6 +77,9 @@ INSTALLED_APPS = [
     'mytask',
     'customadmin',
 ]
+
+if _USE_CLOUDINARY:
+    INSTALLED_APPS += ['cloudinary_storage']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -158,18 +173,27 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-# Local filesystem storage is the default for this project. On Vercel the app
-# uses /tmp/media because the project directory is read-only. Cloudinary remains
-# disabled intentionally.
-STORAGES = {
-    'default': {
-        'BACKEND': 'django.core.files.storage.FileSystemStorage',
-        'OPTIONS': {'location': str(MEDIA_ROOT)},
-    },
-    'staticfiles': {
-        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
-    },
-}
+# Media storage: Cloudinary in production (persistent across deploys/restarts),
+# local filesystem in development (unchanged behavior).
+if _USE_CLOUDINARY:
+    STORAGES = {
+        'default': {
+            'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
+        },
+        'staticfiles': {
+            'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+        },
+    }
+else:
+    STORAGES = {
+        'default': {
+            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+            'OPTIONS': {'location': str(MEDIA_ROOT)},
+        },
+        'staticfiles': {
+            'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+        },
+    }
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
