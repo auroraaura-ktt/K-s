@@ -1,13 +1,15 @@
-from django import forms
+﻿from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 
 from mytask.models import (
+    Application,
     Profile,
     Project,
     Skill,
     Experience,
     Education,
     SocialLink,
+    Album,
 )
 
 
@@ -93,11 +95,16 @@ class ProfileForm(forms.ModelForm):
 
 
 class ProjectForm(forms.ModelForm):
+
     class Meta:
         model = Project
         fields = [
             'title', 'description', 'photo', 'url', 'github_url',
             'is_featured',
+            # Optional case-study details. All are blank-safe, so older
+            # projects simply leave these sections out of the detail page.
+            'role', 'client', 'status',
+            'technologies', 'features', 'responsibilities', 'additional_info',
         ]
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Project title'}),
@@ -105,8 +112,98 @@ class ProjectForm(forms.ModelForm):
             'url': forms.URLInput(attrs={'class': 'form-input', 'placeholder': 'https://...'}),
             'github_url': forms.URLInput(attrs={'class': 'form-input', 'placeholder': 'https://github.com/...'}),
             'is_featured': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+            'role': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Full Stack Developer'}),
+            'client': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Personal'}),
+            'status': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Completed'}),
+            'technologies': forms.Textarea(attrs={'rows': 3, 'class': 'form-input', 'placeholder': 'React\nTypeScript\nNode.js'}),
+            'features': forms.Textarea(attrs={'rows': 4, 'class': 'form-input', 'placeholder': 'One feature per line'}),
+            'responsibilities': forms.Textarea(attrs={'rows': 3, 'class': 'form-input', 'placeholder': 'One responsibility per line'}),
+            'additional_info': forms.Textarea(attrs={'rows': 3, 'class': 'form-input'}),
         }
 
+class ApplicationForm(forms.ModelForm):
+    """Form for uploading and managing downloadable applications (.exe / .apk)."""
+
+    MAX_FILE_SIZE = 200 * 1024 * 1024  # 200 MB
+
+    # Executable / installer file signatures (magic bytes) so we validate the
+    # actual file content and do not trust the client-provided extension/MIME.
+    _SIGNATURES = {
+        'exe': (b'MZ', 'Windows executable (.exe)'),
+        'apk': (b'PK\x03\x04', 'Android package (.apk)'),
+    }
+
+    class Meta:
+        model = Application
+        fields = [
+            'name', 'description', 'version', 'file', 'icon',
+            'is_published', 'is_publicly_downloadable',
+        ]
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Application name'}),
+            'description': forms.Textarea(attrs={'rows': 4, 'class': 'form-input', 'placeholder': 'What does this application do?'}),
+            'version': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'e.g. 1.0.0'}),
+            'file': forms.ClearableFileInput(attrs={'class': 'form-input', 'accept': '.exe,.apk'}),
+            'icon': forms.ClearableFileInput(attrs={'class': 'form-input', 'accept': 'image/*'}),
+            'is_published': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+            'is_publicly_downloadable': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
+        }
+        help_texts = {
+            'version': 'Application version, e.g. 1.0.0',
+            'is_published': 'Publish so the app appears on the public Apps page.',
+            'is_publicly_downloadable': 'Allow visitors to download the file (only applies when published).',
+        }
+
+    def clean_file(self):
+        file = self.cleaned_data.get('file')
+        if not file:
+            # On edits, a missing file means "keep the existing file."
+            return file
+
+        # Reject empty files.
+        if getattr(file, 'size', None) == 0:
+            raise forms.ValidationError('The uploaded file is empty.')
+
+        # Enforce a maximum file size.
+        if file.size > self.MAX_FILE_SIZE:
+            mb = self.MAX_FILE_SIZE // (1024 * 1024)
+            raise forms.ValidationError(f'File is too large. Maximum size is {mb} MB.')
+
+        # Validate actual file content (magic bytes), not the client-provided
+        # extension or MIME type.
+        extension = (file.name.rsplit('.', 1)[-1] if '.' in file.name else '').lower()
+        expected, label = self._SIGNATURES.get(extension, (None, None))
+        if expected is None:
+            raise forms.ValidationError('Only .exe and .apk files are allowed.')
+
+        header = file.read(len(expected))
+        file.seek(0)
+        if not header.startswith(expected):
+            raise forms.ValidationError(
+                f'File content does not match a valid {label}. '
+                'The file may be corrupted or of an unsupported type.'
+            )
+
+        return file
+
+    def clean_version(self):
+        return (self.cleaned_data.get('version') or '').strip()
+
+    def clean_name(self):
+        return (self.cleaned_data.get('name') or '').strip()
+
+
+class AlbumForm(forms.ModelForm):
+
+    class Meta:
+        model = Album
+        fields = [
+            'album_name', 'album_description', 'album_photo',
+        ]
+        widgets = {
+            'album_name': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Album title'}),
+            'album_description': forms.Textarea(attrs={'rows': 4, 'class': 'form-input'}),
+        }
 
 class SkillForm(forms.ModelForm):
     class Meta:

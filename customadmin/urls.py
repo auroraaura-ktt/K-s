@@ -23,6 +23,20 @@ urlpatterns = [
     path('projects/<int:pk>/edit/', views.project_edit, name='project_edit'),
     path('projects/<int:pk>/delete/', views.project_delete, name='project_delete'),
 
+    path('projects/<int:pk>/image/<int:image_pk>/delete/', views.project_image_delete, name='project_image_delete'),
+
+    # Applications
+    path('applications/', views.application_list, name='application_list'),
+    path('applications/add/', views.application_add, name='application_add'),
+    path('applications/<int:pk>/edit/', views.application_edit, name='application_edit'),
+    path('applications/<int:pk>/delete/', views.application_delete, name='application_delete'),
+
+    # Albums
+    path('albums/', views.album_list, name='album_list'),
+    path('albums/add/', views.album_add, name='album_add'),
+    path('albums/<int:pk>/edit/', views.album_edit, name='album_edit'),
+    path('albums/<int:pk>/delete/', views.album_delete, name='album_delete'),
+    path('albums/<int:pk>/image/<int:image_pk>/delete/', views.album_image_delete, name='album_image_delete'),
     # Skills
     path('skills/', views.skill_list, name='skill_list'),
     path('skills/add/', views.skill_add, name='skill_add'),

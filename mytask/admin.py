@@ -2,12 +2,24 @@ from django.contrib import admin
 from .models import (
     Profile,
     Project,
+    ProjectImage,
     Skill,
     Experience,
     Education,
     ContactMessage,
     Album,
+    AlbumImage,
 )
+
+
+class ProjectImageInline(admin.TabularInline):
+    model = ProjectImage
+    extra = 1
+
+
+class AlbumImageInline(admin.TabularInline):
+    model = AlbumImage
+    extra = 1
 
 
 @admin.register(Profile)
@@ -19,6 +31,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
+    inlines = [ProjectImageInline]
     list_display = ('title', 'is_featured', 'date_created')
     list_filter = ('is_featured', 'date_created')
     search_fields = ('title', 'description')
@@ -59,6 +72,7 @@ class ContactMessageAdmin(admin.ModelAdmin):
 
 @admin.register(Album)
 class AlbumAdmin(admin.ModelAdmin):
+    inlines = [AlbumImageInline]
     list_display = ('album_name', 'date_created')
     search_fields = ('album_name', 'album_description')
     ordering = ('-date_created',)

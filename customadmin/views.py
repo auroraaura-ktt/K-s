@@ -1,23 +1,33 @@
-from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
+﻿from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import HttpResponseForbidden
+
+# Staff-only access control: returns 403 for authenticated non-staff users.
+staff_required = user_passes_test(lambda u: u.is_staff, login_url=None)
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 
 from mytask.models import (
+    Application,
     Profile,
     Project,
+ProjectImage,
     Skill,
     Experience,
     Education,
     ContactMessage,
     SocialLink,
+Album,
+    AlbumImage,
 )
 from .forms import (
     AdminLoginForm,
+    ApplicationForm,
     ProfileForm,
     ProjectForm,
     SkillForm,
     ExperienceForm,
+AlbumForm,
     EducationForm,
     SocialLinkForm,
 )
@@ -58,6 +68,8 @@ def dashboard(request):
     """Admin dashboard with overview statistics."""
     stats = {
         'projects': Project.objects.count(),
+        'albums': Album.objects.count(),
+        'applications': Application.objects.count(),
         'skills': Skill.objects.count(),
         'experiences': Experience.objects.count(),
         'educations': Education.objects.count(),
@@ -122,17 +134,24 @@ def project_list(request):
     return render(request, 'customadmin/project_list.html', {'projects': projects})
 
 
+def _save_project_images(project, request):
+    """Create a ProjectImage for each uploaded additional photo."""
+    for index, uploaded in enumerate(request.FILES.getlist('images')):
+        ProjectImage.objects.create(project=project, image=uploaded, order=index)
+
+
 @login_required
 def project_add(request):
     if request.method == 'POST':
         form = ProjectForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
+            _save_project_images(form.instance, request)
             messages.success(request, 'Project added successfully.')
             return redirect('customadmin:project_list')
     else:
         form = ProjectForm()
-    return render(request, 'customadmin/project_form.html', {'form': form, 'action': 'Add'})
+    return render(request, 'customadmin/project_form.html', {'form': form, 'action': 'Add', 'object': form.instance})
 
 
 @login_required
@@ -142,11 +161,12 @@ def project_edit(request, pk):
         form = ProjectForm(request.POST, request.FILES, instance=project)
         if form.is_valid():
             form.save()
+            _save_project_images(form.instance, request)
             messages.success(request, 'Project updated successfully.')
             return redirect('customadmin:project_list')
     else:
         form = ProjectForm(instance=project)
-    return render(request, 'customadmin/project_form.html', {'form': form, 'action': 'Edit'})
+    return render(request, 'customadmin/project_form.html', {'form': form, 'action': 'Edit', 'object': project})
 
 
 @login_required
@@ -378,4 +398,137 @@ def message_delete(request, pk):
         return redirect('customadmin:message_list')
     return render(request, 'customadmin/confirm_delete.html', {
         'object': message, 'model_name': 'Contact Message',
+    })
+
+
+def _save_album_images(album, request):
+    """Create an AlbumImage for each uploaded additional photo."""
+    for index, uploaded in enumerate(request.FILES.getlist('images')):
+        AlbumImage.objects.create(album=album, image=uploaded, order=index)
+
+
+@login_required
+def project_image_delete(request, pk, image_pk):
+    image = get_object_or_404(ProjectImage, pk=image_pk)
+    project = image.project
+    image.delete()
+    messages.success(request, 'Project photo deleted successfully.')
+    return redirect('customadmin:project_edit', pk=project.pk)
+
+
+@login_required
+def album_list(request):
+    albums = Album.objects.all().order_by('-date_created')
+    return render(request, 'customadmin/album_list.html', {'albums': albums})
+
+
+@login_required
+def album_add(request):
+    if request.method == 'POST':
+        form = AlbumForm(request.POST, request.FILES)
+        if form.is_valid():
+            album = form.save()
+            _save_album_images(album, request)
+            messages.success(request, 'Album added successfully.')
+            return redirect('customadmin:album_list')
+    else:
+        form = AlbumForm()
+    return render(request, 'customadmin/album_form.html', {'form': form, 'action': 'Add', 'object': form.instance})
+
+
+@login_required
+def album_edit(request, pk):
+    album = get_object_or_404(Album, pk=pk)
+    if request.method == 'POST':
+        form = AlbumForm(request.POST, request.FILES, instance=album)
+        if form.is_valid():
+            album = form.save()
+            _save_album_images(album, request)
+            messages.success(request, 'Album updated successfully.')
+            return redirect('customadmin:album_list')
+    else:
+        form = AlbumForm(instance=album)
+    return render(request, 'customadmin/album_form.html', {'form': form, 'action': 'Edit', 'object': album})
+
+
+@login_required
+def album_delete(request, pk):
+    album = get_object_or_404(Album, pk=pk)
+    if request.method == 'POST':
+        album.delete()
+        messages.success(request, 'Album deleted successfully.')
+        return redirect('customadmin:album_list')
+    return render(request, 'customadmin/confirm_delete.html', {
+        'object': album, 'model_name': 'Album',
+    })
+
+
+@login_required
+def album_image_delete(request, pk, image_pk):
+    image = get_object_or_404(AlbumImage, pk=image_pk)
+    album = image.album
+    image.delete()
+    messages.success(request, 'Album photo deleted successfully.')
+    return redirect('customadmin:album_edit', pk=album.pk)
+
+
+# Application CRUD
+
+
+@login_required
+@staff_required
+def application_list(request):
+    """List all uploaded applications for management."""
+    applications = Application.objects.all().order_by('-date_created')
+    return render(request, 'customadmin/application_list.html', {'applications': applications})
+
+
+@login_required
+@staff_required
+def application_add(request):
+    """Upload a new application file."""
+    if request.method == 'POST':
+        form = ApplicationForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Application uploaded successfully.')
+            return redirect('customadmin:application_list')
+    else:
+        form = ApplicationForm()
+    return render(request, 'customadmin/application_form.html', {'form': form, 'action': 'Add'})
+
+
+@login_required
+@staff_required
+def application_edit(request, pk):
+    """Edit application metadata and replace its binary file."""
+    app = get_object_or_404(Application, pk=pk)
+    old_file = app.file if app.file else None
+    if request.method == 'POST':
+        form = ApplicationForm(request.POST, request.FILES, instance=app)
+        if form.is_valid():
+            form.save()
+            # Replace: remove the previously stored binary when a new file was uploaded.
+            if old_file and form.cleaned_data.get('file'):
+                old_file.delete(save=False)
+            messages.success(request, 'Application updated successfully.')
+            return redirect('customadmin:application_list')
+    else:
+        form = ApplicationForm(instance=app)
+    return render(request, 'customadmin/application_form.html', {
+        'form': form, 'action': 'Edit', 'application': app,
+    })
+
+
+@login_required
+@staff_required
+def application_delete(request, pk):
+    """Delete an application and its stored file."""
+    app = get_object_or_404(Application, pk=pk)
+    if request.method == 'POST':
+        app.delete()
+        messages.success(request, 'Application deleted successfully.')
+        return redirect('customadmin:application_list')
+    return render(request, 'customadmin/confirm_delete.html', {
+        'object': app, 'model_name': 'Application',
     })

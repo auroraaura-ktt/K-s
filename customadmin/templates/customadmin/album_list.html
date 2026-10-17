@@ -1,0 +1,40 @@
+{% extends 'customadmin/base.html' %}
+
+{% block title %}Albums{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--color-text);">Albums</h1>
+    <a href="{% url 'customadmin:album_add' %}" class="btn-primary">Add Album</a>
+</div>
+
+{% if albums %}
+<div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 100%;">
+    {% for album in albums %}
+    <div class="card" style="padding: 1.5rem;">
+        {% if album.album_photo %}
+        <img src="{{ album.album_photo.url }}" alt="{{ album.album_name }}" style="width: 100%; height: 8rem; object-fit: cover; border-radius: 0.5rem; margin-bottom: 1rem;">
+        {% else %}
+        <div style="width: 100%; height: 8rem; background-color: #e5e7eb; border-radius: 0.5rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; color: #6b7280;"><span>No Image</span></div>
+        {% endif %}
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--color-text); margin-bottom: 0.25rem;">{{ album.album_name }}</h3>
+                <p style="color: #4b5563; font-size: 0.875rem; margin-bottom: 0.5rem;">{{ album.album_description|truncatechars:100 }}</p>
+                <span style="font-size: 0.75rem; color: #6b7280;">{{ album.date_created|date:"M d, Y" }} &middot; {{ album.all_photos|length }} photo{{ album.all_photos|length|pluralize }}</span>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <a href="{% url 'customadmin:album_edit' album.pk %}" class="btn-secondary" style="font-size: 0.875rem;">Edit</a>
+                <a href="{% url 'customadmin:album_delete' album.pk %}" class="link-del" style="font-size: 0.875rem; color: #dc2626; text-decoration: none; cursor: pointer;">Delete</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div style="text-align: center; padding: 3rem 1rem;">
+    <h3 style="font-size: 1.25rem; font-weight: 600; color: #4b5563; margin-bottom: 0.5rem;">No albums found</h3>
+    <a href="{% url 'customadmin:album_add' %}" class="btn-primary">Add Your First Album</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -22,14 +22,26 @@
 <header class="navbar">
     <div class="nav-container">
         <a href="{% url 'home' %}" class="logo">
-            <img src="{% static 'logo.png' %}" alt="{% if site_profile %}{{ site_profile.name }}{% else %}kay_tii_tii{% endif %}">
+            <img src="{% static "branding/K's.png" %}" alt="{% if site_profile %}{{ site_profile.name }}{% else %}kay_tii_tii{% endif %}">
         </a>
 
         <nav class="nav-menu" id="navMenu">
             <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a>
             <a href="{% url 'about' %}" class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a>
             <a href="{% url 'education' %}" class="nav-link {% if request.resolver_match.url_name == 'education' %}active{% endif %}">Education</a>
-            <a href="{% url 'projects' %}" class="nav-link {% if request.resolver_match.url_name == 'projects' or request.resolver_match.url_name == 'project_detail' %}active{% endif %}">Projects</a>
+            <div class="nav-dropdown">
+                <a href="{% url 'projects' %}" class="nav-link {% if request.resolver_match.url_name == 'projects' or request.resolver_match.url_name == 'project_detail' %}active{% endif %}" aria-haspopup="true" aria-expanded="false">Projects</a>
+                <div class="dropdown-menu">
+                    <a href="{% url 'projects' %}" class="dropdown-link {% if request.resolver_match.url_name == 'projects' or request.resolver_match.url_name == 'project_detail' %}active{% endif %}" aria-label="Web Projects">
+                        <span class="dropdown-icon"><i class="fa-solid fa-globe"></i></span>
+                        <span class="dropdown-label">Web Projects</span>
+                    </a>
+                    <a href="{% url 'apps' %}" class="dropdown-link {% if request.resolver_match.url_name == 'apps' or request.resolver_match.url_name == 'app_detail' or request.resolver_match.url_name == 'app_download' %}active{% endif %}" aria-label="Applications">
+                        <span class="dropdown-icon"><i class="fa-solid fa-window-restore"></i></span>
+                        <span class="dropdown-label">Applications</span>
+                    </a>
+                </div>
+            </div>
             <a href="{% url 'albums' %}" class="nav-link {% if request.resolver_match.url_name == 'albums' or request.resolver_match.url_name == 'album_details' %}active{% endif %}">Albums</a>
             <a href="{% url 'contact' %}" class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}">Contact</a>
         </nav>
@@ -97,7 +109,43 @@
     const navMenu = document.getElementById('navMenu');
     if (menuBtn && navMenu) {
         menuBtn.addEventListener('click', () => navMenu.classList.toggle('show'));
+        // Collapse the mobile menu when any navigation link is tapped.
+        navMenu.querySelectorAll('a').forEach((link) => {
+            link.addEventListener('click', () => navMenu.classList.remove('show'));
+        });
     }
+
+    // Projects dropdown: tap to open/close on mobile/touch; desktop keeps :hover
+    // and :focus-within behavior with normal link navigation preserved.
+    (function () {
+        const trigger = document.querySelector('.nav-dropdown > .nav-link[aria-haspopup="true"]');
+        if (!trigger) return;
+        const dropdown = trigger.parentElement;
+        const menu = dropdown.querySelector('.dropdown-menu');
+
+        function setExpanded(expanded) {
+            trigger.setAttribute('aria-expanded', String(expanded));
+        }
+
+        trigger.addEventListener('click', function (event) {
+            // On desktop, leave hover/focus navigation and link navigation intact.
+            if (window.matchMedia('(min-width: 769px)').matches) {
+                setExpanded(dropdown.classList.contains('open'));
+                return;
+            }
+            event.preventDefault();
+            const isOpen = dropdown.classList.toggle('open');
+            setExpanded(isOpen);
+        });
+
+        // Close the dropdown when a choice is tapped.
+        menu.querySelectorAll('a').forEach(function (link) {
+            link.addEventListener('click', function () {
+                dropdown.classList.remove('open');
+                setExpanded(false);
+            });
+        });
+    })();
 
     // Back to top
     const topBtn = document.getElementById('topBtn');

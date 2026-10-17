@@ -18,9 +18,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env.development.local")
 
-# Media files uploaded by users
+
+def is_serverless_runtime():
+    """True on Vercel/serverless hosts where the filesystem is read-only."""
+    return bool(
+        os.environ.get('VERCEL')
+        or os.environ.get('AWS_LAMBDA_FUNCTION_NAME')
+        or os.environ.get('WEBSITE_INSTANCE_ID')
+    )
+
+
+# Media files uploaded by users. Serverless deployments cannot write to the
+# project directory because it is read-only, so use /tmp/media there and keep a
+# normal local media folder for local development.
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = Path('/tmp/media') if is_serverless_runtime() else BASE_DIR / 'media'
+MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 
 
 # Quick-start development settings - unsuitable for production
@@ -49,8 +62,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary',
-    'cloudinary_storage',
     'mytask',
     'customadmin',
 ]
@@ -66,6 +77,14 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'myblog.urls'
+
+# Authentication redirects.
+# The project has its own admin login at /myadmin/login/. Without these
+# settings Django falls back to /accounts/login/, which is not routed in this
+# project, so every @login_required redirect landed on a 404 instead of the
+# real sign-in page.
+LOGIN_URL = 'customadmin:login'
+LOGIN_REDIRECT_URL = 'customadmin:dashboard'
 
 TEMPLATES = [
     {
@@ -139,32 +158,18 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-# Cloudinary configuration for media file storage
-# This is required because Vercel has a read-only filesystem
-CLOUDINARY_CLOUD_NAME = os.environ.get('CLOUDINARY_CLOUD_NAME', '')
-CLOUDINARY_API_KEY = os.environ.get('CLOUDINARY_API_KEY', '')
-CLOUDINARY_API_SECRET = os.environ.get('CLOUDINARY_API_SECRET', '')
-
-# Use Cloudinary for media file storage when credentials are configured,
-# otherwise fall back to local filesystem storage (for local development)
-if CLOUDINARY_CLOUD_NAME and CLOUDINARY_CLOUD_NAME != 'your-cloud-name':
-    STORAGES = {
-        'default': {
-            'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
-        },
-        'staticfiles': {
-            'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
-        },
-    }
-else:
-    STORAGES = {
-        'default': {
-            'BACKEND': 'django.core.files.storage.FileSystemStorage',
-        },
-        'staticfiles': {
-            'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
-        },
-    }
+# Local filesystem storage is the default for this project. On Vercel the app
+# uses /tmp/media because the project directory is read-only. Cloudinary remains
+# disabled intentionally.
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        'OPTIONS': {'location': str(MEDIA_ROOT)},
+    },
+    'staticfiles': {
+        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

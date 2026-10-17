@@ -56,6 +56,16 @@
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                     Projects
                 </a>
+                {% if user.is_staff %}
+                <a href="{% url 'customadmin:application_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'application_list' or request.resolver_match.url_name == 'application_add' or request.resolver_match.url_name == 'application_edit' or request.resolver_match.url_name == 'application_delete' %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    Applications
+                </a>
+                {% endif %}
+                <a href="{% url 'customadmin:album_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'album_list' or request.resolver_match.url_name == 'album_add' or request.resolver_match.url_name == 'album_edit' %}active{% endif %}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M5 10l7 2 7-2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V10z"/></svg>
+                    Albums
+                </a>
                 <a href="{% url 'customadmin:skill_list' %}" class="sidebar-link {% if request.resolver_match.url_name == 'skill_list' or request.resolver_match.url_name == 'skill_add' or request.resolver_match.url_name == 'skill_edit' %}active{% endif %}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                     Skills

@@ -3,7 +3,7 @@
 {% block title %}{{ action }} Project{% endblock %}
 
 {% block content %}
-<div style="max-width: 42rem; margin: 0 auto;">
+<div style="max-width: 48rem; margin: 0 auto;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
         <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--color-text);">{{ action }} Project</h1>
         <a href="{% url 'customadmin:project_list' %}" class="btn-secondary">Back</a>
@@ -21,9 +21,31 @@
                 {{ form.description }}
             </div>
             <div>
-                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Photo</label>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Cover Photo</label>
                 {{ form.photo }}
             </div>
+
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Additional Photos</label>
+                <input type="file" name="images" class="form-input" multiple>
+                <p style="font-size: 0.75rem; color: #6b7582; margin-top: 0.25rem;">Add more photos (hold Ctrl/Cmd to pick several).</p>
+            </div>
+
+            {% if object and object.images.all %}
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.5rem;">Existing additional photos</label>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    {% for img in object.images.all %}
+                    <div style="background: rgba(0,0,0,0.05); border-radius: 6px; padding: 0.3rem; display: flex; align-items: center; gap: 0.3rem;">
+                        <img src="{{ img.image.url }}" alt="photo" style="width: 70px; height: 55px; object-fit: cover; border-radius: 4px;">
+                        <a href="{% url 'customadmin:project_image_delete' object.pk img.pk %}" class="link-del" style="font-size: 0.9rem; color: #dc2626; text-decoration: none;" title="Remove photo" onclick="return confirm('Remove this photo?')">&#215;</a>
+                    </div>
+                    {% endfor %}
+                </div>
+                <p style="font-size: 0.75rem; color: #6b7582; margin-top: 0.5rem;">Remove before adding replacements.</p>
+            </div>
+            {% endif %}
+
             <div>
                 <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Live Demo URL</label>
                 {{ form.url }}
@@ -32,6 +54,43 @@
                 <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">GitHub URL</label>
                 {{ form.github_url }}
             </div>
+
+            <p style="font-size: 0.8rem; color: #6b7582; margin: 0.5rem 0 0;">
+                Optional case-study details. Anything left blank is simply hidden on the project page.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                <div>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Role</label>
+                    {{ form.role }}
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Client</label>
+                    {{ form.client }}
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Status</label>
+                    {{ form.status }}
+                </div>
+            </div>
+
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Technologies</label>
+                {{ form.technologies }}
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Key Features</label>
+                {{ form.features }}
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Responsibilities</label>
+                {{ form.responsibilities }}
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Additional Information</label>
+                {{ form.additional_info }}
+            </div>
+
             <div style="display: flex; align-items: center;">
                 {{ form.is_featured }}
                 <label style="margin-left: 0.5rem; font-size: 0.875rem; font-weight: 500; color: var(--color-text);">Featured Project</label>

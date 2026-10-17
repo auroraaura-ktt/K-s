@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Apps - Kay Tii Tii{% endblock %}
+
+{% block content %}
+<style>
+    /* Apps page layout: keep the footer at the bottom of the page.
+       With short content the footer stays at the viewport bottom;
+       with long content it appears after the content. No fixed or
+       absolute positioning is used, so nothing overlaps. */
+    body {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+    main {
+        flex-grow: 1;
+    }
+</style>
+<section class="section apps-section">
+    <div class="page-wrap">
+
+        <div class="apps-header">
+            <div class="section-title left">
+                <h2>My Apps<span>.</span></h2>
+            </div>
+        </div>
+
+        {% if applications %}
+        <div class="apps-grid" style="grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));">
+            {% for app in applications %}
+            <article class="app-card">
+                <div class="app-image">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">
+                        {% if app.platform == 'windows' %}🪟{% elif app.platform == 'android' %}🤖{% else %}📦{% endif %}
+                    </div>
+                    <h3>{{ app.name }}</h3>
+                    {% if app.version %}
+                    <span style="font-size: 0.85rem; color: var(--cyan);">v{{ app.version }}</span>
+                    {% endif %}
+                    <span style="font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; background: rgba(0,217,255,0.15); color: var(--cyan); margin-top: 0.5rem; display: inline-block;">{{ app.platform|title }}</span>
+                </div>
+                <div class="app-info">
+                    {% if app.description %}
+                    <p>{{ app.description|truncatechars:120 }}</p>
+                    {% endif %}
+                    <div class="app-bottom">
+                        <span>{{ app.date_created|date:"M d, Y" }}</span>
+                        {% if app.is_publicly_downloadable %}
+                        <a href="{% url 'app_download' app.id %}" class="app-download-btn" aria-label="Download {{ app.name }}">
+                            <i class="fa-solid fa-download"></i> Download
+                        </a>
+                        {% else %}
+                        <a href="{% url 'app_detail' app.id %}" class="app-detail-btn" aria-label="View {{ app.name }} details">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Details
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="glass-card" style="text-align: center; padding: 50px 30px;">
+            <i class="fa-solid fa-download" style="font-size: 32px; color: var(--cyan); margin-bottom: 12px;"></i>
+            <h2>No apps available<span>.</span></h2>
+            <p>Applications will be added soon.</p>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'customadmin/base.html' %}
+
+{% block title %}{{ action }} Application{% endblock %}
+
+{% block content %}
+<div style="max-width: 48rem; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--color-text);">{{ action }} Application</h1>
+        <a href="{% url 'customadmin:application_list' %}" class="btn-secondary">Back</a>
+    </div>
+
+    <div class="card" style="padding: 1.5rem;">
+        <form method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1rem;">
+            {% csrf_token %}
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Name</label>
+                {{ form.name }}
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Description</label>
+                {{ form.description }}
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Platform</label>
+                {{ form.platform }}
+            </div>
+            <div>
+                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Application File (.exe or .apk)</label>
+                {{ form.file }}
+                {% if form.file.errors %}
+                <p style="font-size: 0.75rem; color: #dc2626; margin-top: 0.25rem;">{{ form.file.errors.0 }}</p>
+                {% endif %}
+                <p style="font-size: 0.75rem; color: #6b7582; margin-top: 0.25rem;">Windows .exe or Android .apk only. Max 200 MB. File type is verified by magic bytes, not extension.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                <div>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Version</label>
+                    {{ form.version }}
+                </div>
+                <div>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Download Count</label>
+                    {{ form.download_count }}
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center;">
+                {{ form.is_published }}
+                <label style="margin-left: 0.5rem; font-size: 0.875rem; font-weight: 500; color: var(--color-text);">Published (visible on public apps page)</label>
+            </div>
+            <div style="display: flex; align-items: center;">
+                {{ form.is_publicly_downloadable }}
+                <label style="margin-left: 0.5rem; font-size: 0.875rem; font-weight: 500; color: var(--color-text);">Publicly Downloadable (allows direct file download)</label>
+            </div>
+
+            {% if application and application.file %}
+            <div style="background: rgba(0,0,0,0.05); border-radius: 6px; padding: 1rem; margin-top: 0.5rem;">
+                <p style="font-size: 0.875rem; color: #4b5563; margin: 0 0 0.5rem 0;"><strong>Current file:</strong> {{ application.original_filename }}</p>
+                <p style="font-size: 0.75rem; color: #6b7280; margin: 0;">Uploading a new file will replace the existing one.</p>
+            </div>
+            {% endif %}
+
+            <button type="submit" class="btn-primary" style="width: 100%;">Save</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

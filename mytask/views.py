@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.http import Http404, FileResponse
 
-from .models import Project, Profile, Skill, Experience, Education, ContactMessage, Album, SocialLink
+from .models import Application, Project, Profile, Skill, Experience, Education, ContactMessage, Album, SocialLink
 from .forms import ContactForm
 
 
@@ -122,3 +123,54 @@ def contact(request):
         'profile': profile,
         'form': form,
     })
+
+
+def apps(request):
+    """Public Apps listing page (published applications only)."""
+    profile = get_active_profile()
+    applications = Application.objects.filter(is_published=True).order_by('-date_created')
+    return render(request, 'apps.html', {
+        'profile': profile,
+        'applications': applications,
+    })
+
+
+def app_detail(request, app_id):
+    """Single application detail page (published applications only)."""
+    profile = get_active_profile()
+    app = get_object_or_404(Application, id=app_id, is_published=True)
+    return render(request, 'app_detail.html', {
+        'profile': profile,
+        'app': app,
+    })
+
+
+def app_download(request, app_id):
+    """Secure download endpoint for published, publicly downloadable apps.
+
+    Only applications flagged as both published and publicly downloadable can
+    be fetched through this endpoint; everything else returns 404 so the
+    existence of private/restricted builds is not leaked.
+    """
+    app = get_object_or_404(
+        Application,
+        id=app_id,
+        is_published=True,
+        is_publicly_downloadable=True,
+    )
+    if not app.file:
+        raise Http404('No file is attached to this application.')
+
+    # Serve as an attachment so the browser downloads the binary instead of
+    # attempting to display or execute it. Content-Type is forced to a generic
+    # binary type and MIME sniffing is disabled.
+    file = app.file.open('rb')
+    response = FileResponse(
+        file,
+        as_attachment=True,
+        filename=app.original_filename or app.file.name.rsplit('/', 1)[-1],
+    )
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Length'] = app.file_size or app.file.size
+    response['X-Content-Type-Options'] = 'nosniff'
+    return response

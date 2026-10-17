@@ -1,0 +1,1593 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Album Detail</title>
+
+
+    <style>
+
+        /* =========================================
+           BASIC RESET
+        ========================================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        /* =========================================
+           BODY
+        ========================================= */
+
+        body {
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #020f21;
+
+            color: white;
+
+            min-height: 100vh;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 40px 20px;
+        }
+
+
+        /* =========================================
+           MAIN ALBUM CONTAINER
+        ========================================= */
+
+        .album-container {
+
+            width: 87%;
+
+            max-width: 1380px;
+
+            display: grid;
+
+            grid-template-columns:
+                minmax(0, 1fr)
+                minmax(0, 1fr);
+
+            background: #061b37;
+
+            border: 1px solid #07577d;
+
+            border-radius: 17px;
+
+            overflow: hidden;
+        }
+
+
+        /* =========================================
+           PHOTO SECTION
+        ========================================= */
+
+        .photo-section {
+
+            position: relative;
+
+            background: #071e3c;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            overflow: hidden;
+
+            min-height: 525px;
+        }
+
+
+        /* =========================================
+           SLIDESHOW
+        ========================================= */
+
+        .slideshow {
+
+            position: relative;
+
+            width: 100%;
+
+            min-height: 525px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            overflow: hidden;
+
+            background: #071e3c;
+        }
+
+
+        /* =========================================
+           ORIENTATION FRAME
+        ========================================= */
+
+        /*
+         * Landscape image
+         */
+
+        .slideshow.landscape {
+
+            aspect-ratio: 16 / 9;
+
+            min-height: 0;
+        }
+
+
+        /*
+         * Portrait image
+         */
+
+        .slideshow.portrait {
+
+            aspect-ratio: 3 / 4;
+
+            min-height: 0;
+        }
+
+
+        /*
+         * Square image
+         */
+
+        .slideshow.square {
+
+            aspect-ratio: 1 / 1;
+
+            min-height: 0;
+        }
+
+
+        /* =========================================
+           INDIVIDUAL SLIDE
+        ========================================= */
+
+        .slide {
+
+            position: absolute;
+
+            inset: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            opacity: 0;
+
+            visibility: hidden;
+
+            transition:
+                opacity 0.8s ease,
+                visibility 0.8s ease;
+
+            pointer-events: none;
+        }
+
+
+        /* =========================================
+           ACTIVE SLIDE
+        ========================================= */
+
+        .slide.active {
+
+            opacity: 1;
+
+            visibility: visible;
+
+            pointer-events: auto;
+        }
+
+
+        /* =========================================
+           IMAGES
+        ========================================= */
+
+        .slide img {
+
+            display: block;
+
+            width: auto;
+
+            height: auto;
+
+            max-width: 100%;
+
+            max-height: 100%;
+
+            object-fit: contain;
+
+            object-position: center;
+
+            border-radius: 2px;
+
+            user-select: none;
+
+            -webkit-user-drag: none;
+        }
+
+
+        /*
+         * Landscape image
+         */
+
+        .slideshow.landscape .slide img {
+
+            width: 100%;
+
+            height: auto;
+
+            max-width: 100%;
+
+            max-height: 100%;
+        }
+
+
+        /*
+         * Portrait image
+         */
+
+        .slideshow.portrait .slide img {
+
+            width: auto;
+
+            height: 100%;
+
+            max-width: 100%;
+
+            max-height: 100%;
+        }
+
+
+        /*
+         * Square image
+         */
+
+        .slideshow.square .slide img {
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: contain;
+        }
+
+
+        /* =========================================
+           PREVIOUS / NEXT BUTTONS
+        ========================================= */
+
+        .prev,
+        .next {
+
+            position: absolute;
+
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            width: 45px;
+
+            height: 45px;
+
+            border-radius: 50%;
+
+            border: 1px solid #00d9ff;
+
+            background:
+                rgba(2, 15, 33, 0.75);
+
+            color: #00d9ff;
+
+            font-size: 25px;
+
+            line-height: 1;
+
+            cursor: pointer;
+
+            z-index: 20;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            transition:
+                background 0.3s ease,
+                color 0.3s ease,
+                transform 0.3s ease;
+        }
+
+
+        .prev {
+
+            left: 20px;
+        }
+
+
+        .next {
+
+            right: 20px;
+        }
+
+
+        .prev:hover,
+        .next:hover {
+
+            background: #00d9ff;
+
+            color: #02101f;
+
+            transform:
+                translateY(-50%)
+                scale(1.05);
+        }
+
+
+        /* =========================================
+           PHOTO COUNTER
+        ========================================= */
+
+        .counter {
+
+            position: absolute;
+
+            top: 20px;
+
+            right: 20px;
+
+            background:
+                rgba(0, 0, 0, 0.6);
+
+            padding:
+                7px 13px;
+
+            border-radius: 20px;
+
+            font-size: 13px;
+
+            color: white;
+
+            z-index: 20;
+        }
+
+
+        /* =========================================
+           DOTS
+        ========================================= */
+
+        .dots {
+
+            position: absolute;
+
+            bottom: 22px;
+
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            z-index: 20;
+        }
+
+
+        .dot {
+
+            width: 9px;
+
+            height: 9px;
+
+            padding: 0;
+
+            border: none;
+
+            border-radius: 50%;
+
+            background: #527086;
+
+            cursor: pointer;
+
+            transition:
+                width 0.3s ease,
+                background 0.3s ease;
+        }
+
+
+        .dot.active {
+
+            width: 25px;
+
+            border-radius: 10px;
+
+            background: #00d9ff;
+        }
+
+
+        .dot:hover {
+
+            background: #00d9ff;
+        }
+
+
+        /* =========================================
+           RIGHT INFORMATION SECTION
+        ========================================= */
+
+        .info-section {
+
+            padding:
+                80px
+                52px
+                45px
+                52px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            justify-content: center;
+
+            min-width: 0;
+        }
+
+
+        /* =========================================
+           ALBUM LABEL
+        ========================================= */
+
+        .label {
+
+            color: #00d9ff;
+
+            font-size: 15px;
+
+            letter-spacing: 5px;
+
+            margin-bottom: 12px;
+
+            font-weight: 500;
+        }
+
+
+        /* =========================================
+           TITLE
+        ========================================= */
+
+        .title {
+
+            font-size: 52px;
+
+            line-height: 1.1;
+
+            font-weight: 700;
+
+            margin-bottom: 12px;
+        }
+
+
+        .title span {
+
+            color: #00d9ff;
+        }
+
+
+        /* =========================================
+           DESCRIPTION
+        ========================================= */
+
+        .description {
+
+            color: #8ea3bb;
+
+            font-size: 17px;
+
+            line-height: 1.6;
+
+            margin-bottom: 32px;
+
+            max-width: 620px;
+        }
+
+
+        /* =========================================
+           DIVIDER
+        ========================================= */
+
+        .line {
+
+            height: 1px;
+
+            background: #123554;
+
+            width: 100%;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* =========================================
+           ABOUT ALBUM
+        ========================================= */
+
+        .album-details {
+
+            margin-bottom: 28px;
+        }
+
+
+        .album-details h2 {
+
+            font-size: 20px;
+
+            color: white;
+
+            margin-bottom: 13px;
+
+            font-weight: 600;
+        }
+
+
+        .album-details p {
+
+            color: #8ea3bb;
+
+            font-size: 15px;
+
+            line-height: 1.8;
+
+            margin-bottom: 10px;
+
+            max-width: 570px;
+        }
+
+
+        /* =========================================
+           BOTTOM INFORMATION
+        ========================================= */
+
+        .bottom-info {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            margin-top: 10px;
+        }
+
+
+        /* =========================================
+           DATE
+        ========================================= */
+
+        .date {
+
+            color: #aebdce;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            font-size: 16px;
+
+            white-space: nowrap;
+        }
+
+
+        .calendar {
+
+            color: #00d9ff;
+
+            font-size: 20px;
+        }
+
+
+        /* =========================================
+           BACK BUTTON
+        ========================================= */
+
+        .back-button {
+
+            padding:
+                13px 24px;
+
+            border:
+                1px solid #00d9ff;
+
+            border-radius: 10px;
+
+            color: white;
+
+            background: transparent;
+
+            text-decoration: none;
+
+            font-size: 16px;
+
+            transition:
+                background 0.3s ease,
+                color 0.3s ease;
+
+            white-space: nowrap;
+        }
+
+
+        .back-button:hover {
+
+            background: #00d9ff;
+
+            color: #02101f;
+        }
+
+
+        /* =========================================
+           TABLET
+        ========================================= */
+
+        @media (max-width: 1000px) {
+
+            body {
+
+                padding: 30px 15px;
+            }
+
+
+            .album-container {
+
+                width: 95%;
+
+                grid-template-columns:
+                    minmax(0, 1fr)
+                    minmax(0, 1fr);
+            }
+
+
+            .photo-section {
+
+                min-height: 450px;
+            }
+
+
+            .slideshow {
+
+                min-height: 450px;
+            }
+
+
+            .info-section {
+
+                padding:
+                    60px
+                    35px
+                    35px;
+            }
+
+
+            .title {
+
+                font-size: 42px;
+            }
+
+
+            .description {
+
+                font-size: 16px;
+            }
+
+
+            .album-details p {
+
+                font-size: 14px;
+
+                line-height: 1.7;
+            }
+
+
+            .bottom-info {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+            }
+
+        }
+
+
+        /* =========================================
+           MOBILE
+        ========================================= */
+
+        @media (max-width: 750px) {
+
+            body {
+
+                padding:
+                    20px 12px;
+
+                align-items: flex-start;
+            }
+
+
+            .album-container {
+
+                width: 100%;
+
+                grid-template-columns: 1fr;
+
+                min-height: auto;
+            }
+
+
+            /* -------------------------------------
+               Photo area
+            ------------------------------------- */
+
+            .photo-section {
+
+                min-height: 0;
+
+                height: auto;
+
+                width: 100%;
+            }
+
+
+            .slideshow {
+
+                min-height: 0;
+
+                width: 100%;
+            }
+
+
+            /*
+             * Keep portrait photos from becoming
+             * excessively tall on small screens.
+             */
+
+            .slideshow.portrait {
+
+                aspect-ratio: 3 / 4;
+            }
+
+
+            /*
+             * Landscape photos remain landscape.
+             */
+
+            .slideshow.landscape {
+
+                aspect-ratio: 16 / 9;
+            }
+
+
+            /*
+             * Square photos remain square.
+             */
+
+            .slideshow.square {
+
+                aspect-ratio: 1 / 1;
+            }
+
+
+            /* -------------------------------------
+               Information
+            ------------------------------------- */
+
+            .info-section {
+
+                padding:
+                    45px
+                    28px
+                    35px;
+            }
+
+
+            .title {
+
+                font-size: 40px;
+            }
+
+
+            .description {
+
+                font-size: 16px;
+
+                margin-bottom: 25px;
+            }
+
+
+            .album-details {
+
+                margin-bottom: 25px;
+            }
+
+
+            .bottom-info {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                margin-top: 10px;
+            }
+
+
+            .back-button {
+
+                width: 100%;
+
+                text-align: center;
+            }
+
+        }
+
+
+        /* =========================================
+           SMALL MOBILE
+        ========================================= */
+
+        @media (max-width: 450px) {
+
+            .prev,
+            .next {
+
+                width: 38px;
+
+                height: 38px;
+
+                font-size: 20px;
+            }
+
+
+            .prev {
+
+                left: 10px;
+            }
+
+
+            .next {
+
+                right: 10px;
+            }
+
+
+            .counter {
+
+                top: 12px;
+
+                right: 12px;
+
+                font-size: 12px;
+
+                padding:
+                    6px 10px;
+            }
+
+
+            .dots {
+
+                bottom: 15px;
+
+                gap: 6px;
+            }
+
+
+            .dot {
+
+                width: 8px;
+
+                height: 8px;
+            }
+
+
+            .dot.active {
+
+                width: 21px;
+            }
+
+
+            .info-section {
+
+                padding:
+                    35px 22px;
+            }
+
+
+            .title {
+
+                font-size: 34px;
+            }
+
+
+            .label {
+
+                font-size: 13px;
+
+                letter-spacing: 4px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================================
+         ALBUM CONTAINER
+    ========================================= -->
+
+    <div class="album-container">
+
+
+        <!-- =====================================
+             LEFT: PHOTO SLIDESHOW
+        ====================================== -->
+
+        <div class="photo-section">
+
+            <div
+                class="slideshow"
+                id="slideshow"
+            >
+
+
+                <!-- PHOTO 1 - LANDSCAPE -->
+
+                <div class="slide active">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1600&q=85"
+                        alt="Summer landscape"
+                    >
+
+                </div>
+
+
+                <!-- PHOTO 2 - PORTRAIT -->
+
+                <div class="slide">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1500534623283-312aade485b7?w=1200&q=85"
+                        alt="Summer portrait"
+                    >
+
+                </div>
+
+
+                <!-- PHOTO 3 - LANDSCAPE -->
+
+                <div class="slide">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1600&q=85"
+                        alt="Forest landscape"
+                    >
+
+                </div>
+
+
+                <!-- PHOTO 4 - LANDSCAPE -->
+
+                <div class="slide">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1600&q=85"
+                        alt="Mountain landscape"
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =================================
+                 PHOTO COUNTER
+            ================================== -->
+
+            <div
+                class="counter"
+                id="counter"
+            >
+                1 / 4
+            </div>
+
+
+            <!-- =================================
+                 PREVIOUS BUTTON
+            ================================== -->
+
+            <button
+                class="prev"
+                id="prevButton"
+                type="button"
+                aria-label="Previous photo"
+            >
+                &#10094;
+            </button>
+
+
+            <!-- =================================
+                 NEXT BUTTON
+            ================================== -->
+
+            <button
+                class="next"
+                id="nextButton"
+                type="button"
+                aria-label="Next photo"
+            >
+                &#10095;
+            </button>
+
+
+            <!-- =================================
+                 PHOTO DOTS
+            ================================== -->
+
+            <div class="dots">
+
+
+                <button
+                    class="dot active"
+                    type="button"
+                    data-slide="0"
+                    aria-label="Photo 1"
+                ></button>
+
+
+                <button
+                    class="dot"
+                    type="button"
+                    data-slide="1"
+                    aria-label="Photo 2"
+                ></button>
+
+
+                <button
+                    class="dot"
+                    type="button"
+                    data-slide="2"
+                    aria-label="Photo 3"
+                ></button>
+
+
+                <button
+                    class="dot"
+                    type="button"
+                    data-slide="3"
+                    aria-label="Photo 4"
+                ></button>
+
+
+            </div>
+
+
+        </div>
+
+
+        <!-- =====================================
+             RIGHT: ALBUM INFORMATION
+        ====================================== -->
+
+        <div class="info-section">
+
+
+            <!-- ALBUM LABEL -->
+
+            <div class="label">
+                ALBUM
+            </div>
+
+
+            <!-- TITLE -->
+
+            <h1 class="title">
+                Summer Memories<span>.</span>
+            </h1>
+
+
+            <!-- SHORT DESCRIPTION -->
+
+            <p class="description">
+                A collection of beautiful moments captured
+                during our summer journey.
+            </p>
+
+
+            <!-- DIVIDER -->
+
+            <div class="line"></div>
+
+
+            <!-- ABOUT ALBUM -->
+
+            <div class="album-details">
+
+                <h2>
+                    About This Album
+                </h2>
+
+
+                <p>
+                    This album contains some of the most
+                    memorable moments from our summer trip.
+                    Each photo captures a different experience,
+                    from peaceful places to unforgettable
+                    adventures with friends.
+                </p>
+
+
+                <p>
+                    Browse through the photos and enjoy
+                    the memories one moment at a time.
+                </p>
+
+            </div>
+
+
+            <!-- =================================
+                 DATE + BACK BUTTON
+            ================================== -->
+
+            <div class="bottom-info">
+
+
+                <!-- DATE -->
+
+                <div class="date">
+
+                    <span class="calendar">
+                        ▣
+                    </span>
+
+                    Aug 06, 2026
+
+                </div>
+
+
+                <!-- BACK BUTTON -->
+
+                <a
+                    href="#"
+                    class="back-button"
+                >
+                    ← &nbsp; Back to Albums
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+    <!-- =========================================
+         JAVASCRIPT
+    ========================================== -->
+
+    <script>
+
+        /* =========================================
+           VARIABLES
+        ========================================= */
+
+        let currentSlide = 0;
+
+        const slides =
+            document.querySelectorAll(".slide");
+
+        const dots =
+            document.querySelectorAll(".dot");
+
+        const counter =
+            document.getElementById("counter");
+
+        const prevButton =
+            document.getElementById("prevButton");
+
+        const nextButton =
+            document.getElementById("nextButton");
+
+        const slideshow =
+            document.getElementById("slideshow");
+
+
+        /* =========================================
+           DETECT IMAGE ORIENTATION
+        ========================================= */
+
+        function setImageOrientation(index) {
+
+            const image =
+                slides[index].querySelector("img");
+
+
+            if (!image) {
+                return;
+            }
+
+
+            function updateOrientation() {
+
+                const width =
+                    image.naturalWidth;
+
+                const height =
+                    image.naturalHeight;
+
+
+                if (!width || !height) {
+                    return;
+                }
+
+
+                /*
+                 * Remove old orientation.
+                 */
+
+                slideshow.classList.remove(
+                    "landscape",
+                    "portrait",
+                    "square"
+                );
+
+
+                /*
+                 * Landscape
+                 */
+
+                if (width > height) {
+
+                    slideshow.classList.add(
+                        "landscape"
+                    );
+
+                }
+
+
+                /*
+                 * Portrait
+                 */
+
+                else if (height > width) {
+
+                    slideshow.classList.add(
+                        "portrait"
+                    );
+
+                }
+
+
+                /*
+                 * Square
+                 */
+
+                else {
+
+                    slideshow.classList.add(
+                        "square"
+                    );
+
+                }
+
+            }
+
+
+            /*
+             * If image is already loaded.
+             */
+
+            if (image.complete) {
+
+                updateOrientation();
+
+            }
+
+
+            /*
+             * If image loads afterward.
+             */
+
+            image.addEventListener(
+                "load",
+                updateOrientation,
+                {
+                    once: true
+                }
+            );
+
+        }
+
+
+        /* =========================================
+           SHOW SLIDE
+        ========================================= */
+
+        function showSlide(index) {
+
+
+            /*
+             * Loop to first image.
+             */
+
+            if (index >= slides.length) {
+
+                currentSlide = 0;
+
+            }
+
+
+            /*
+             * Loop to last image.
+             */
+
+            else if (index < 0) {
+
+                currentSlide =
+                    slides.length - 1;
+
+            }
+
+
+            /*
+             * Normal slide.
+             */
+
+            else {
+
+                currentSlide = index;
+
+            }
+
+
+            /*
+             * Remove active state.
+             */
+
+            slides.forEach(
+                function(slide) {
+
+                    slide.classList.remove(
+                        "active"
+                    );
+
+                }
+            );
+
+
+            dots.forEach(
+                function(dot) {
+
+                    dot.classList.remove(
+                        "active"
+                    );
+
+                }
+            );
+
+
+            /*
+             * Activate current slide.
+             */
+
+            slides[currentSlide]
+                .classList.add("active");
+
+
+            dots[currentSlide]
+                .classList.add("active");
+
+
+            /*
+             * Update counter.
+             */
+
+            counter.textContent =
+                (currentSlide + 1)
+                + " / "
+                + slides.length;
+
+
+            /*
+             * Detect orientation.
+             */
+
+            setImageOrientation(
+                currentSlide
+            );
+
+        }
+
+
+        /* =========================================
+           NEXT PHOTO
+        ========================================= */
+
+        function nextSlide() {
+
+            showSlide(
+                currentSlide + 1
+            );
+
+            resetTimer();
+
+        }
+
+
+        /* =========================================
+           PREVIOUS PHOTO
+        ========================================= */
+
+        function previousSlide() {
+
+            showSlide(
+                currentSlide - 1
+            );
+
+            resetTimer();
+
+        }
+
+
+        /* =========================================
+           DOT BUTTONS
+        ========================================= */
+
+        dots.forEach(
+            function(dot) {
+
+                dot.addEventListener(
+                    "click",
+                    function() {
+
+                        const slideNumber =
+                            Number(
+                                this.dataset.slide
+                            );
+
+
+                        showSlide(
+                            slideNumber
+                        );
+
+
+                        resetTimer();
+
+                    }
+                );
+
+            }
+        );
+
+
+        /* =========================================
+           ARROW BUTTONS
+        ========================================= */
+
+        nextButton.addEventListener(
+            "click",
+            nextSlide
+        );
+
+
+        prevButton.addEventListener(
+            "click",
+            previousSlide
+        );
+
+
+        /* =========================================
+           AUTOMATIC SLIDESHOW
+        ========================================= */
+
+        let slideTimer =
+            setInterval(
+                function() {
+
+                    showSlide(
+                        currentSlide + 1
+                    );
+
+                },
+                4000
+            );
+
+
+        /* =========================================
+           RESET TIMER
+        ========================================= */
+
+        function resetTimer() {
+
+            clearInterval(
+                slideTimer
+            );
+
+
+            slideTimer =
+                setInterval(
+                    function() {
+
+                        showSlide(
+                            currentSlide + 1
+                        );
+
+                    },
+                    4000
+                );
+
+        }
+
+
+        /* =========================================
+           INITIALIZE
+        ========================================= */
+
+        window.addEventListener(
+            "load",
+            function() {
+
+                showSlide(0);
+
+            }
+        );
+
+
+    </script>
+
+
+</body>
+
+</html>
+```

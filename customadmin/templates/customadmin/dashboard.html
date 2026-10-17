@@ -18,6 +18,26 @@
         <p style="color: #696969; margin-bottom: 1rem;">Projects</p>
         <a href="{% url 'customadmin:project_list' %}" class="btn-secondary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">Manage</a>
     </div>
+    {% if user.is_staff %}
+    <!-- Applications Card -->
+    <div class="card card-hover animate-fade-in-up" style="text-align: center; animation-delay: 0.12s;">
+        <div style="width: 3rem; height: 3rem; margin: 0 auto; background: linear-gradient(135deg, #06b6d4, #2563eb); border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.25); margin-bottom: 1rem; transition: transform 0.3s ease;">
+            <svg style="width: 1.5rem; height: 1.5rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+        </div>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.5rem;">{{ stats.applications }}</div>
+        <p style="color: #696969; margin-bottom: 1rem;">Applications</p>
+        <a href="{% url 'customadmin:application_list' %}" class="btn-secondary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">Manage</a>
+    </div>
+    {% endif %}
+    <!-- Albums Card -->
+    <div class="card card-hover animate-fade-in-up" style="text-align: center; animation-delay: 0.15s;">
+        <div style="width: 3rem; height: 3rem; margin: 0 auto; background: linear-gradient(135deg, #06b6d4, #2563eb); border-radius: 1rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); margin-bottom: 1rem; transition: transform 0.3s ease;">
+            <svg style="width: 1.5rem; height: 1.5rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12h18M5 10l7 2 7-2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V10z"/></svg>
+        </div>
+        <div style="font-size: 2rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.5rem;">{{ stats.albums }}</div>
+        <p style="color: #696969; margin-bottom: 1rem;">Albums</p>
+        <a href="{% url 'customadmin:album_list' %}" class="btn-secondary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">Manage</a>
+    </div>
 
     <!-- Skills Card -->
     <div class="card card-hover animate-fade-in-up" style="text-align: center; animation-delay: 0.2s;">
@@ -80,7 +100,11 @@
     </div>
     <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
         <a href="{% url 'customadmin:profile_add' %}" class="btn" style="padding: 0.75rem 1.5rem; font-size: 0.875rem;">Add Profile</a>
-        <a href="{% url 'customadmin:project_add' %}" class="btn" style="padding: 0.75rem 1.5rem; font-size: 0.875rem;">Add Project</a>
+                <a href="{% url 'customadmin:project_add' %}" class="btn" style="padding: 0.75rem 1.5rem; font-size: 0.875rem;">Add Project</a>
+                {% if user.is_staff %}
+                <a href="{% url 'customadmin:application_add' %}" class="btn" style="padding: 0.75rem 1.5rem; font-size: 0.875rem;">Add Application</a>
+                {% endif %}
+        <a href="{% url 'customadmin:album_add' %}" class="btn" style="padding: 0.75rem 1.5rem; font-size: 0.875rem;">Add Album</a>
         <a href="{% url 'customadmin:skill_add' %}" class="btn" style="padding: 0.75rem 1.5rem; font-size: 0.875rem;">Add Skill</a>
         <a href="{% url 'customadmin:experience_add' %}" class="btn" style="padding: 0.75rem 1.5rem; font-size: 0.875rem;">Add Experience</a>
         <a href="{% url 'customadmin:education_add' %}" class="btn" style="padding: 0.75rem 1.5rem; font-size: 0.875rem;">Add Education</a>

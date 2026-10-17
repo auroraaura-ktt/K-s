@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Project Not Found - Kay Tii Tii{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="page-wrap">
+        <div class="glass-card" style="text-align: center; padding: 70px 30px;">
+            <i class="fa-solid fa-folder-open" style="font-size: 40px; color: var(--cyan); margin-bottom: 16px;"></i>
+            <h2>Project not found<span>.</span></h2>
+            <p style="margin-bottom: 24px;">
+                This project may have been removed, or the link you followed is incorrect.
+            </p>
+            <a href="{% url 'projects' %}" class="outline-btn">
+                <i class="fa-solid fa-arrow-left"></i>
+                Back to Projects
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

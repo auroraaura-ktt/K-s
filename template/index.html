@@ -14,10 +14,19 @@
     {% for album in albums %}
     <div class="card card-hover">
         <div style="position: relative; overflow: hidden; height: 12rem;">
-            {% if album.album_photo %}
-            <img src="{{ album.album_photo.url }}" class="album-image" alt="{{ album.album_name }}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+            {% if album.all_photos %}
+            <div class="album-slideshow" data-slideshow>
+                {% for photo in album.all_photos %}
+                <img src="{{ photo.url }}" class="album-image" alt="{{ album.album_name }}" loading="lazy" {% if not forloop.first %}data-hidden{% endif %} style="width: 100%; height: 100%; object-fit: cover;">
+                {% endfor %}
+            </div>
             {% else %}
             <div class="placeholder-image" style="height: 12rem;"><span style="font-size: 0.875rem; font-weight: 600;">No Image</span></div>
+            {% endif %}
+            {% if album.all_photos|length > 1 %}
+            <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #6ee7ff; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600;">
+                {{ album.all_photos|length }} photos
+            </div>
             {% endif %}
         </div>
         <div style="padding: 1.5rem;">
@@ -43,4 +52,40 @@
     <p style="color: #696969;">Add an album from admin panel.</p>
 </div>
 {% endif %}
+
+<style>
+    /* Album card photo slideshow */
+    .album-slideshow {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+    }
+    .album-slideshow img {
+        position: absolute;
+        inset: 0;
+        opacity: 1;
+        transform: translateX(0);
+        transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .album-slideshow img[data-hidden] {
+        opacity: 0;
+        transform: translateX(30px);
+        pointer-events: none;
+    }
+</style>
+<script>
+    (function () {
+        var INTERVAL = 3000;
+        document.querySelectorAll('[data-slideshow]').forEach(function (show) {
+            var slides = show.querySelectorAll('img');
+            if (slides.length < 2) return;
+            var current = 0;
+            setInterval(function () {
+                slides[current].setAttribute('data-hidden', '');
+                current = (current + 1) % slides.length;
+                slides[current].removeAttribute('data-hidden');
+            }, INTERVAL);
+        });
+    })();
+</script>
 {% endblock %}

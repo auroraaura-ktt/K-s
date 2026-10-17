@@ -1,38 +1,82 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}{{ album.album_name }} - Kay Tii Tii{% endblock %}
 
 {% block content %}
 <section class="section">
-    <div class="page-wrap" style="max-width: 1200px;">
+    <div class="page-wrap" style="max-width: 1380px;">
 
-        <div class="glass-container split-detail">
+        <div class="ab-container">
 
-            <!-- PHOTO (half) -->
-            {% if album.album_photo %}
-            <div class="split-media">
-                <img src="{{ album.album_photo.url }}" class="detail-image" alt="{{ album.album_name }}">
-            </div>
-            {% else %}
-            <div class="split-media">
+            <!-- LEFT: PHOTO SLIDESHOW -->
+            <div class="ab-photo">
+                {% if album.all_photos %}
+                <div class="ab-slideshow" data-ab-slideshow>
+                    {% for photo in album.all_photos %}
+                    <div class="ab-slide{% if forloop.first %} active{% endif %}">
+                        <img src="{{ photo.url }}" alt="{{ album.album_name }} photo {{ forloop.counter }}">
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if album.all_photos|length > 1 %}
+                <div class="ab-counter" data-ab-counter>1 / {{ album.all_photos|length }}</div>
+                <button type="button" class="ab-prev" data-ab-prev aria-label="Previous photo">&#10094;</button>
+                <button type="button" class="ab-next" data-ab-next aria-label="Next photo">&#10095;</button>
+                <div class="ab-dots">
+                    {% for photo in album.all_photos %}
+                    <button type="button" class="ab-dot{% if forloop.first %} active{% endif %}" data-ab-dot="{{ forloop.counter0 }}" aria-label="Photo {{ forloop.counter }}"></button>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% else %}
                 <div class="detail-placeholder">No Image</div>
+                {% endif %}
             </div>
-            {% endif %}
 
-            <!-- TEXT (half) -->
-            <div class="split-content">
-                <p class="page-label">Album</p>
-                <h1 class="page-title">{{ album.album_name }}<span>.</span></h1>
-                <p class="page-sub" style="margin-bottom: 20px;">{{ album.album_description }}</p>
+            <!-- RIGHT: ALBUM INFORMATION -->
+            <div class="ab-info">
+                <div class="ab-label">ALBUM</div>
 
-                <div class="meta-row">
-                    <span>
-                        <i class="fa-regular fa-calendar" style="color: var(--cyan); margin-right: 6px;"></i>
+                <h1 class="ab-title">{{ album.album_name }}<span>.</span></h1>
+
+                {% if album.album_description %}
+                <p class="ab-desc">{{ album.album_description|truncatechars:140 }}</p>
+                {% else %}
+                <p class="ab-desc">A collection of photos worth remembering.</p>
+                {% endif %}
+
+                <div class="ab-meta">
+                    <span class="ab-chip">
+                        <i class="fa-solid fa-images"></i>
+                        {{ album.all_photos|length }} photo{{ album.all_photos|length|pluralize }}
+                    </span>
+                    <span class="ab-chip">
+                        <i class="fa-regular fa-calendar"></i>
                         {{ album.date_created|date:"M d, Y" }}
                     </span>
-                    <a href="{% url 'albums' %}" class="secondary-btn" style="padding: 10px 18px;">
-                        <i class="fa-solid fa-arrow-left"></i> Back to Albums
-                    </a>
+                </div>
+
+                <div class="ab-line"></div>
+
+                <div class="ab-about">
+                    <h2>About This Album</h2>
+                    {% if album.album_description %}
+                    <p>{{ album.album_description }}</p>
+                    {% else %}
+                    <p>No description has been added for this album yet.</p>
+                    {% endif %}
+                </div>
+
+                {% if user.is_authenticated %}
+                <div class="ab-actions">
+                    <a href="{% url 'customadmin:album_edit' album.id %}" class="ab-back" style="padding: 10px 18px;">&#9998; Edit</a>
+                    <a href="{% url 'customadmin:album_delete' album.id %}" class="ab-back" style="padding: 10px 18px; border-color: #ff6b7a;" onclick="return confirm('Are you sure?')">&#128465; Delete</a>
+                </div>
+                {% endif %}
+
+                <div class="ab-bottom">
+                    <a href="{% url 'albums' %}" class="ab-back">&#8592; &nbsp; Back to Albums</a>
                 </div>
             </div>
 
@@ -40,4 +84,59 @@
 
     </div>
 </section>
+
+<script>
+(function () {
+    var slideshows = document.querySelectorAll('[data-ab-slideshow]');
+    slideshows.forEach(function (slideshow) {
+        var slides = Array.prototype.slice.call(slideshow.querySelectorAll('.ab-slide'));
+        var photo = slideshow.closest('.ab-photo');
+        if (!photo || slides.length < 2) return;
+
+        var counter = photo.querySelector('[data-ab-counter]');
+        var prevBtn = photo.querySelector('[data-ab-prev]');
+        var nextBtn = photo.querySelector('[data-ab-next]');
+        var dotBtns = Array.prototype.slice.call(photo.querySelectorAll('[data-ab-dot]'));
+
+        var current = 0;
+        var timer = null;
+
+        function show(index) {
+            current = ((index % slides.length) + slides.length) % slides.length;
+            slides.forEach(function (slide, k) {
+                slide.classList.toggle('active', k === current);
+            });
+            dotBtns.forEach(function (dot, k) {
+                dot.classList.toggle('active', k === current);
+            });
+            if (counter) {
+                counter.textContent = (current + 1) + ' / ' + slides.length;
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timer);
+            timer = setInterval(function () { show(current + 1); }, 4000);
+        }
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function () { show(current + 1); resetTimer(); });
+        }
+        if (prevBtn) {
+            prevBtn.addEventListener('click', function () { show(current - 1); resetTimer(); });
+        }
+        dotBtns.forEach(function (dot) {
+            dot.addEventListener('click', function () {
+                show(Number(dot.getAttribute('data-ab-dot')));
+                resetTimer();
+            });
+        });
+
+        photo.addEventListener('mouseenter', function () { clearInterval(timer); });
+        photo.addEventListener('mouseleave', resetTimer);
+
+        resetTimer();
+    });
+})();
+</script>
 {% endblock %}

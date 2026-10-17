@@ -1,74 +1,226 @@
-﻿{% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block title %}{{ project.title }} - Kay Tii Tii{% endblock %}
 
 {% block content %}
-<section class="section">
-    <div class="page-wrap" style="max-width: 1200px;">
+<section class="section project-details-section">
+    <div class="page-wrap">
 
-        <div class="glass-container split-detail">
+        <!-- ================= BACK LINK ================= -->
+        <a href="{% url 'projects' %}" class="pd-back-link">
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+            <span>Back to Projects</span>
+        </a>
 
-            <!-- PHOTO (half) -->
-            {% if project.photo %}
-            <div class="split-media">
-                <img src="{{ project.photo.url }}" class="detail-image" alt="{{ project.title }}">
-            </div>
-            {% else %}
-            <div class="split-media">
-                <div class="detail-placeholder">No Image</div>
-            </div>
-            {% endif %}
+        <article class="project-details-card">
 
-            <!-- TEXT (half) -->
-            <div class="split-content">
-                {% if project.is_featured %}
-                <span class="badge-cyan" style="margin-bottom: 12px; display: inline-block;">Featured</span>
-                {% endif %}
+            <div class="project-details-content">
 
-                {% if user.is_authenticated %}
-                <div class="hero-buttons" style="margin: 0 0 18px; gap: 10px;">
-                    <a href="{% url 'customadmin:project_edit' project.id %}" class="outline-btn" style="padding: 10px 16px;">
-                        <i class="fa-solid fa-pen"></i> Edit
-                    </a>
-                    <a href="{% url 'customadmin:project_delete' project.id %}" class="outline-btn" style="padding: 10px 16px; border-color: #ff6b7a;" onclick="return confirm('Are you sure?')">
-                        <i class="fa-solid fa-trash"></i> Delete
-                    </a>
+                <!-- ================= LEFT: RESPONSIVE IMAGE VIEWER ================= -->
+                <div class="project-media-panel">
+                    <div class="project-media">
+                        {% if project.all_photos %}
+                        <div class="project-media-viewer">
+                            <div class="ab-slideshow" data-ab-slideshow>
+                                {% for photo in project.all_photos %}
+                                <button type="button" class="ab-slide{% if forloop.first %} active{% endif %}"
+                                        data-ab-slide="{{ forloop.counter0 }}"
+                                        aria-label="Open {{ project.title }} image {{ forloop.counter }}">
+                                    {% if forloop.first %}
+                                    <img src="{{ photo.url }}" alt="{{ project.title }} project image {{ forloop.counter }}">
+                                    {% else %}
+                                    <img data-src="{{ photo.url }}" alt="{{ project.title }} project image {{ forloop.counter }}" loading="lazy">
+                                    {% endif %}
+                                </button>
+                                {% endfor %}
+                            </div>
+
+                            {% if project.all_photos|length > 1 %}
+                            <div class="ab-counter" data-ab-counter aria-live="polite">1 / {{ project.all_photos|length }}</div>
+                            <button type="button" class="ab-prev" data-ab-prev aria-label="Previous image">&#10094;</button>
+                            <button type="button" class="ab-next" data-ab-next aria-label="Next image">&#10095;</button>
+                            {% endif %}
+                        </div>
+
+                        {% if project.all_photos|length > 1 %}
+                        <div class="ab-thumbnails" role="group" aria-label="Project image thumbnails">
+                            {% for photo in project.all_photos %}
+                            {% if forloop.counter <= 4 %}
+                            <button type="button" class="ab-thumbnail{% if forloop.first %} active{% endif %}"
+                                    data-ab-thumb="{{ forloop.counter0 }}"
+                                    aria-label="{% if forloop.counter == 4 and project.all_photos|length > 4 %}Open full image gallery{% else %}Show image {{ forloop.counter }}{% endif %}"
+                                    aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">
+                                <img src="{{ photo.url }}" alt="" loading="lazy">
+                                {% if forloop.counter == 4 and project.all_photos|length > 4 %}
+                                <span class="ab-more" data-ab-open-gallery>+ {{ project.all_photos|length|add:"-4" }} more</span>
+                                {% endif %}
+                            </button>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <dialog class="ab-lightbox" data-ab-lightbox aria-label="{{ project.title }} image gallery">
+                            <div class="ab-lightbox-toolbar">
+                                <span class="ab-lightbox-counter" data-ab-lightbox-counter aria-live="polite">1 / {{ project.all_photos|length }}</span>
+                                <button type="button" data-ab-close aria-label="Close gallery">&#10005;</button>
+                            </div>
+                            <button type="button" class="ab-prev" data-ab-lightbox-prev aria-label="Previous image">&#10094;</button>
+                            <img data-ab-lightbox-image alt="">
+                            <button type="button" class="ab-next" data-ab-lightbox-next aria-label="Next image">&#10095;</button>
+                        </dialog>
+                        {% else %}
+                        <div class="project-media-viewer project-media-empty">
+                            <div class="detail-placeholder">No Image</div>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
-                {% endif %}
 
-                <p class="page-label">Project</p>
-                <h1 class="page-title">{{ project.title }}<span>.</span></h1>
-                <p class="page-sub" style="margin-bottom: 20px;">{{ project.description }}</p>
+                <!-- ================= RIGHT: CASE STUDY (INTERNAL SCROLL) ================= -->
+                <div class="project-details-info" tabindex="0" aria-label="Project information">
+                    <div class="project-details-inner">
 
-                {% if project.url or project.github_url %}
-                <div class="hero-buttons" style="margin-bottom: 10px;">
-                    {% if project.url %}
-                    <a href="{{ project.url }}" target="_blank" class="primary-btn">
-                        Live Demo
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    </a>
-                    {% endif %}
-                    {% if project.github_url %}
-                    <a href="{{ project.github_url }}" target="_blank" class="secondary-btn">
-                        <i class="fa-brands fa-github"></i> GitHub
-                    </a>
-                    {% endif %}
+                        <div class="pd-eyebrow">
+                            <span class="pd-label">Project</span>
+                            {% if project.is_featured %}
+                            <span class="badge-cyan ab-badge">Featured</span>
+                            {% endif %}
+                        </div>
+
+                        <h1 class="pd-title">{{ project.title }}</h1>
+
+                        {% if project.summary %}
+                        <p class="pd-summary">{{ project.summary }}</p>
+                        {% endif %}
+
+                        {% if project.role or project.date_created or project.status or project.client or project.all_photos %}
+                        <dl class="pd-metadata">
+                            {% if project.role %}
+                            <div class="pd-meta-item">
+                                <dt>Role</dt>
+                                <dd>{{ project.role }}</dd>
+                            </div>
+                            {% endif %}
+                            {% if project.date_created %}
+                            <div class="pd-meta-item">
+                                <dt>Date</dt>
+                                <dd>{{ project.date_created|date:"M d, Y" }}</dd>
+                            </div>
+                            {% endif %}
+                            {% if project.status %}
+                            <div class="pd-meta-item">
+                                <dt>Status</dt>
+                                <dd>{{ project.status }}</dd>
+                            </div>
+                            {% endif %}
+                            {% if project.client %}
+                            <div class="pd-meta-item">
+                                <dt>Client</dt>
+                                <dd>{{ project.client }}</dd>
+                            </div>
+                            {% endif %}
+                            {% if project.all_photos %}
+                            <div class="pd-meta-item">
+                                <dt>Gallery</dt>
+                                <dd>{{ project.all_photos|length }} image{{ project.all_photos|length|pluralize }}</dd>
+                            </div>
+                            {% endif %}
+                        </dl>
+                        {% endif %}
+
+                        {% if project.live_url or project.repository_url or user.is_authenticated %}
+                        <div class="pd-actions">
+                            {% if project.live_url %}
+                            <a href="{{ project.live_url }}" target="_blank" rel="noopener noreferrer" class="pd-btn pd-btn-primary">
+                                <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Live Demo
+                            </a>
+                            {% endif %}
+                            {% if project.repository_url %}
+                            <a href="{{ project.repository_url }}" target="_blank" rel="noopener noreferrer" class="pd-btn">
+                                <i class="fa-brands fa-github" aria-hidden="true"></i> GitHub
+                            </a>
+                            {% endif %}
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'customadmin:project_edit' project.id %}" class="pd-btn pd-btn-ghost">
+                                <i class="fa-solid fa-pen" aria-hidden="true"></i> Edit
+                            </a>
+                            <a href="{% url 'customadmin:project_delete' project.id %}" class="pd-btn pd-btn-ghost pd-btn-danger"
+                               onclick="return confirm('Are you sure?')">
+                                <i class="fa-solid fa-trash" aria-hidden="true"></i> Delete
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        {% if project.description_body_paragraphs %}
+                        <section class="pd-section">
+                            <h2>About This Project</h2>
+                            <div class="pd-prose project-description">
+                                {% for paragraph in project.description_body_paragraphs %}
+                                <p>{{ paragraph }}</p>
+                                {% endfor %}
+                            </div>
+                        </section>
+                        {% endif %}
+
+                        {% if project.feature_list %}
+                        <section class="pd-section">
+                            <h2>Key Features</h2>
+                            <ul class="pd-features">
+                                {% for feature in project.feature_list %}
+                                <li>{{ feature }}</li>
+                                {% endfor %}
+                            </ul>
+                        </section>
+                        {% endif %}
+
+                        {% if project.technology_list %}
+                        <section class="pd-section">
+                            <h2>Technologies</h2>
+                            <ul class="pd-technologies">
+                                {% for technology in project.technology_list %}
+                                <li>{{ technology }}</li>
+                                {% endfor %}
+                            </ul>
+                        </section>
+                        {% endif %}
+
+                        {% if project.responsibility_list %}
+                        <section class="pd-section">
+                            <h2>My Role</h2>
+                            <ul class="pd-features">
+                                {% for responsibility in project.responsibility_list %}
+                                <li>{{ responsibility }}</li>
+                                {% endfor %}
+                            </ul>
+                        </section>
+                        {% endif %}
+
+                        {% if project.additional_info %}
+                        <section class="pd-section">
+                            <h2>Additional Information</h2>
+                            <div class="pd-prose">
+                                {% for paragraph in project.additional_info.splitlines %}
+                                {% if paragraph.strip %}<p>{{ paragraph }}</p>{% endif %}
+                                {% endfor %}
+                            </div>
+                        </section>
+                        {% endif %}
+
+                        <div class="pd-foot">
+                            <a href="{% url 'projects' %}" class="pd-back">
+                                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Projects
+                            </a>
+                        </div>
+
+                    </div>
                 </div>
-                {% endif %}
 
-                <div class="meta-row">
-                    <span>
-                        <i class="fa-regular fa-calendar" style="color: var(--cyan); margin-right: 6px;"></i>
-                        Created: {{ project.date_created|date:"M d, Y" }}
-                    </span>
-                    <a href="{% url 'projects' %}" class="secondary-btn" style="padding: 10px 18px;">
-                        <i class="fa-solid fa-arrow-left"></i> Back to Projects
-                    </a>
-                </div>
             </div>
+        </article>
 
-        </div>
-<!-- Prev / Next project navigation -->
+        <!-- Prev / Next project navigation -->
         {% if prev_project or next_project %}
         <div class="detail-nav">
             {% if prev_project %}
@@ -97,7 +249,7 @@
 
         <!-- More projects -->
         {% if more_projects %}
-        <div style="margin-top: 60px;">
+        <div class="project-more">
             <div class="page-head">
                 <h2>More Projects<span>.</span></h2>
                 <a href="{% url 'projects' %}" class="outline-btn">
@@ -135,4 +287,97 @@
 
     </div>
 </section>
+<script>
+(function () {
+    var gallery = document.querySelector('.project-media-panel');
+    if (!gallery) return;
+
+    var slides = Array.prototype.slice.call(gallery.querySelectorAll('[data-ab-slide]'));
+    var thumbnails = Array.prototype.slice.call(gallery.querySelectorAll('[data-ab-thumb]'));
+    var counter = gallery.querySelector('[data-ab-counter]');
+    var lightbox = gallery.querySelector('[data-ab-lightbox]');
+    var lightboxImage = gallery.querySelector('[data-ab-lightbox-image]');
+    var lightboxCounter = gallery.querySelector('[data-ab-lightbox-counter]');
+    var current = 0;
+
+    function getSlideImage(index) {
+        var image = slides[index].querySelector('img');
+        if (image.dataset.src) {
+            image.src = image.dataset.src;
+            delete image.dataset.src;
+        }
+        return image;
+    }
+
+    function updateLightbox() {
+        var image = getSlideImage(current);
+        lightboxImage.src = image.currentSrc || image.src;
+        lightboxImage.alt = image.alt;
+        if (lightboxCounter) lightboxCounter.textContent = (current + 1) + ' / ' + slides.length;
+    }
+
+    function show(index) {
+        current = (index + slides.length) % slides.length;
+        slides.forEach(function (slide, slideIndex) {
+            slide.classList.toggle('active', slideIndex === current);
+        });
+        thumbnails.forEach(function (thumbnail) {
+            var selected = Number(thumbnail.getAttribute('data-ab-thumb')) === current;
+            thumbnail.classList.toggle('active', selected);
+            thumbnail.setAttribute('aria-pressed', selected ? 'true' : 'false');
+        });
+        if (counter) counter.textContent = (current + 1) + ' / ' + slides.length;
+        if (lightbox && lightbox.open) updateLightbox();
+    }
+
+    function openLightbox() {
+        if (!lightbox) return;
+        updateLightbox();
+        lightbox.showModal();
+    }
+
+    slides.forEach(function (slide, index) {
+        slide.addEventListener('click', function () {
+            show(index);
+            openLightbox();
+        });
+    });
+    thumbnails.forEach(function (thumbnail) {
+        thumbnail.addEventListener('click', function (event) {
+            show(Number(thumbnail.getAttribute('data-ab-thumb')));
+            if (event.target.closest('[data-ab-open-gallery]')) openLightbox();
+        });
+    });
+
+    var previous = gallery.querySelector('[data-ab-prev]');
+    var next = gallery.querySelector('[data-ab-next]');
+    if (previous) previous.addEventListener('click', function () { show(current - 1); });
+    if (next) next.addEventListener('click', function () { show(current + 1); });
+
+    show(0);
+    if (!lightbox) return;
+    lightbox.querySelector('[data-ab-close]').addEventListener('click', function () { lightbox.close(); });
+    lightbox.querySelector('[data-ab-lightbox-prev]').addEventListener('click', function () { show(current - 1); });
+    lightbox.querySelector('[data-ab-lightbox-next]').addEventListener('click', function () { show(current + 1); });
+    lightbox.addEventListener('click', function (event) {
+        if (event.target === lightbox) lightbox.close();
+    });
+    document.addEventListener('keydown', function (event) {
+        if (!lightbox.open) return;
+        if (event.key === 'ArrowLeft') show(current - 1);
+        if (event.key === 'ArrowRight') show(current + 1);
+    });
+
+    // Arrow keys move through the gallery from anywhere on the page, but only
+    // while the gallery itself has keyboard focus, so the arrow keys keep
+    // their normal meaning everywhere else.
+    if (slides.length > 1) {
+        gallery.addEventListener('keydown', function (event) {
+            if (lightbox.open) return;
+            if (event.key === 'ArrowLeft') { show(current - 1); }
+            if (event.key === 'ArrowRight') { show(current + 1); }
+        });
+    }
+})();
+</script>
 {% endblock %}

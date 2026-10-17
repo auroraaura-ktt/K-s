@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ app.name }} - Kay Tii Tii{% endblock %}
+
+{% block content %}
+<section class="section app-details-section">
+    <div class="page-wrap">
+
+        <!-- ================= BACK LINK ================= -->
+        <a href="{% url 'apps' %}" class="pd-back-link">
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+            <span>Back to Apps</span>
+        </a>
+
+        <article class="app-details-card">
+
+            <div class="app-details-content">
+
+                <!-- ================= LEFT: APP ICON / INFO ================= -->
+                <div class="app-media-panel">
+                    <div class="app-media">
+                        <div style="font-size: 5rem; margin-bottom: 1.5rem;">
+                            {% if app.platform == 'windows' %}🪟{% elif app.platform == 'android' %}🤖{% else %}📦{% endif %}
+                        </div>
+                        <h1 style="font-size: 2rem; font-weight: 700; color: var(--color-text); margin-bottom: 0.5rem;">{{ app.name }}</h1>
+                        {% if app.version %}
+                        <p style="font-size: 1.1rem; color: var(--cyan); font-weight: 600; margin-bottom: 1rem;">Version {{ app.version }}</p>
+                        {% endif %}
+                        <span style="font-size: 0.85rem; padding: 4px 12px; border-radius: 6px; background: rgba(0,217,255,0.15); color: var(--cyan); border: 1px solid var(--cyan);">{{ app.platform|title }}</span>
+                    </div>
+                </div>
+
+                <!-- ================= RIGHT: DETAILS ================= -->
+                <div class="app-info-panel">
+
+                    {% if app.description %}
+                    <div class="app-description">
+                        <h3 style="font-size: 1.1rem; font-weight: 600; color: var(--color-text); margin-bottom: 0.75rem;">About</h3>
+                        <p style="color: #cfd8e2; line-height: 1.6;">{{ app.description }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="app-actions" style="margin-top: 1.5rem;">
+                        {% if app.is_publicly_downloadable and app.file %}
+                        <a href="{% url 'app_download' app.id %}" class="btn-download">
+                            <i class="fa-solid fa-download"></i> Download {{ app.name }}
+                            {% if app.file_size %} ({{ app.file_size }} bytes){% endif %}
+                        </a>
+                        {% else %}
+                        <a href="#" class="btn-download" style="opacity: 0.6; cursor: not-allowed;">
+                            <i class="fa-solid fa-download"></i> Download Not Available
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <div class="app-meta" style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                        <p style="font-size: 0.85rem; color: #8b98a8; margin: 0.25rem 0;"><strong>Published:</strong> {% if app.is_published %}Yes{% else %}No{% endif %}</p>
+                        <p style="font-size: 0.85rem; color: #8b98a8; margin: 0.25rem 0;"><strong>Platform:</strong> {{ app.platform|title }}</p>
+                        <p style="font-size: 0.85rem; color: #8b98a8; margin: 0.25rem 0;"><strong>Added:</strong> {{ app.date_created|date:"M d, Y" }}</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </article>
+    </div>
+</section>
+{% endblock %}

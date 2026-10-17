@@ -1,0 +1,46 @@
+{% extends 'customadmin/base.html' %}
+
+{% block title %}Applications{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--color-text);">Applications</h1>
+    <a href="{% url 'customadmin:application_add' %}" class="btn-primary">Add Application</a>
+</div>
+
+{% if applications %}
+<div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 100%;">
+    {% for app in applications %}
+    <div class="card" style="padding: 1.5rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+            <div style="font-size: 2.5rem;">
+                {% if app.platform == 'windows' %}🪟{% elif app.platform == 'android' %}🤖{% else %}📦{% endif %}
+            </div>
+            <div>
+                <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--color-text); margin-bottom: 0.25rem;">{{ app.name }}</h3>
+                <span style="font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; background: #e5e7eb; color: #4b5563;">{{ app.platform|title }}</span>
+            </div>
+        </div>
+        {% if app.description %}
+        <p style="color: #4b5563; font-size: 0.875rem; margin-bottom: 1rem;">{{ app.description|truncatechars:100 }}</p>
+        {% endif %}
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+            <div style="font-size: 0.75rem; color: #6b7280;">
+                {{ app.date_created|date:"M d, Y" }}
+                {% if app.file_size %} · {{ app.file_size }} bytes{% endif %}
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <a href="{% url 'customadmin:application_edit' app.pk %}" class="btn-secondary" style="font-size: 0.875rem;">Edit</a>
+                <a href="{% url 'customadmin:application_delete' app.pk %}" style="color: #dc2626; font-size: 0.875rem; text-decoration: none; cursor: pointer;">Delete</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div style="text-align: center; padding: 3rem 1rem;">
+    <h3 style="font-size: 1.25rem; font-weight: 600; color: #4b5563; margin-bottom: 0.5rem;">No applications found</h3>
+    <a href="{% url 'customadmin:application_add' %}" class="btn-primary">Upload Your First Application</a>
+</div>
+{% endif %}
+{% endblock %}
