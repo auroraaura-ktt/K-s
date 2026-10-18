@@ -1,3 +1,15 @@
 .vercel
 .env*
 node_modules/
+.venv/
+__pycache__/
+*.py[cod]
+media_backup_*/
+tmp_*.py
+tmp_*.js
+tmp_*.sqlite3
+tmp_*.json
+*_output*.txt
+*.log
+tests_js/
+**/tests.py
