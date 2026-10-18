@@ -26,11 +26,7 @@
                                 <button type="button" class="ab-slide{% if forloop.first %} active{% endif %}"
                                         data-ab-slide="{{ forloop.counter0 }}"
                                         aria-label="Open {{ project.title }} image {{ forloop.counter }}">
-                                    {% if forloop.first %}
                                     <img src="{{ photo.url }}" alt="{{ project.title }} project image {{ forloop.counter }}">
-                                    {% else %}
-                                    <img data-src="{{ photo.url }}" alt="{{ project.title }} project image {{ forloop.counter }}" loading="lazy">
-                                    {% endif %}
                                 </button>
                                 {% endfor %}
                             </div>
@@ -50,7 +46,7 @@
                                     data-ab-thumb="{{ forloop.counter0 }}"
                                     aria-label="{% if forloop.counter == 4 and project.all_photos|length > 4 %}Open full image gallery{% else %}Show image {{ forloop.counter }}{% endif %}"
                                     aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">
-                                <img src="{{ photo.url }}" alt="" loading="lazy">
+                                <img src="{{ photo.url }}" alt="">
                                 {% if forloop.counter == 4 and project.all_photos|length > 4 %}
                                 <span class="ab-more" data-ab-open-gallery>+ {{ project.all_photos|length|add:"-4" }} more</span>
                                 {% endif %}
@@ -302,10 +298,6 @@
 
     function getSlideImage(index) {
         var image = slides[index].querySelector('img');
-        if (image.dataset.src) {
-            image.src = image.dataset.src;
-            delete image.dataset.src;
-        }
         return image;
     }
 
