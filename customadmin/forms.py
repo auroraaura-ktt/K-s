@@ -1,6 +1,8 @@
 ﻿from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 
+from zipfile import BadZipFile, ZipFile
+
 from mytask.models import (
     Application,
     Profile,
@@ -11,6 +13,31 @@ from mytask.models import (
     SocialLink,
     Album,
 )
+
+
+class MultipleImageInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleImageField(forms.FileField):
+    """Validate every selected image with Django's content-based decoder."""
+
+    widget = MultipleImageInput
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault('required', False)
+        kwargs.setdefault('widget', MultipleImageInput(attrs={
+            'class': 'form-input',
+            'accept': 'image/*,.heic,.heif',
+        }))
+        super().__init__(**kwargs)
+
+    def clean(self, data, initial=None):
+        if data in self.empty_values:
+            return []
+        uploads = data if isinstance(data, (list, tuple)) else [data]
+        image_field = forms.ImageField()
+        return [image_field.clean(upload) for upload in uploads if upload]
 
 
 class AdminLoginForm(AuthenticationForm):
@@ -57,6 +84,9 @@ class ProfileForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Your name'}),
             'title': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Your title'}),
             'bio': forms.Textarea(attrs={'rows': 4, 'class': 'form-input'}),
+            'photo': forms.ClearableFileInput(attrs={
+                'class': 'form-input', 'accept': 'image/*,.heic,.heif',
+            }),
             'email': forms.EmailInput(attrs={'class': 'form-input', 'placeholder': 'email@example.com'}),
             'phone': forms.TextInput(attrs={'class': 'form-input', 'placeholder': '+1 234 567 890'}),
             'location': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'City, Country'}),
@@ -95,6 +125,7 @@ class ProfileForm(forms.ModelForm):
 
 
 class ProjectForm(forms.ModelForm):
+    images = MultipleImageField(label='Additional photos')
 
     class Meta:
         model = Project
@@ -109,6 +140,9 @@ class ProjectForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Project title'}),
             'description': forms.Textarea(attrs={'rows': 4, 'class': 'form-input'}),
+            'photo': forms.ClearableFileInput(attrs={
+                'class': 'form-input', 'accept': 'image/*,.heic,.heif',
+            }),
             'url': forms.URLInput(attrs={'class': 'form-input', 'placeholder': 'https://...'}),
             'github_url': forms.URLInput(attrs={'class': 'form-input', 'placeholder': 'https://github.com/...'}),
             'is_featured': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
@@ -184,6 +218,28 @@ class ApplicationForm(forms.ModelForm):
                 'The file may be corrupted or of an unsupported type.'
             )
 
+        if extension == 'exe':
+            file.seek(0)
+            dos_header = file.read(64)
+            if len(dos_header) < 64:
+                raise forms.ValidationError('The Windows executable is incomplete or corrupted.')
+            pe_offset = int.from_bytes(dos_header[0x3C:0x40], 'little')
+            if pe_offset < 64 or pe_offset + 4 > file.size:
+                raise forms.ValidationError('The Windows executable has an invalid PE header.')
+            file.seek(pe_offset)
+            if file.read(4) != b'PE\x00\x00':
+                raise forms.ValidationError('The file does not contain a valid Windows PE signature.')
+        else:
+            file.seek(0)
+            try:
+                with ZipFile(file) as apk:
+                    if 'AndroidManifest.xml' not in apk.namelist():
+                        raise forms.ValidationError(
+                            'The APK archive is missing AndroidManifest.xml.'
+                        )
+            except BadZipFile as exc:
+                raise forms.ValidationError('The APK file is not a valid ZIP archive.') from exc
+        file.seek(0)
         return file
 
     def clean_version(self):
@@ -194,6 +250,7 @@ class ApplicationForm(forms.ModelForm):
 
 
 class AlbumForm(forms.ModelForm):
+    images = MultipleImageField(label='Additional photos')
 
     class Meta:
         model = Album
@@ -203,6 +260,9 @@ class AlbumForm(forms.ModelForm):
         widgets = {
             'album_name': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Album title'}),
             'album_description': forms.Textarea(attrs={'rows': 4, 'class': 'form-input'}),
+            'album_photo': forms.ClearableFileInput(attrs={
+                'class': 'form-input', 'accept': 'image/*,.heic,.heif',
+            }),
         }
 
 class SkillForm(forms.ModelForm):
@@ -252,8 +312,37 @@ class EducationForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 4, 'class': 'form-input'}),
             'start_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
             'end_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-input'}),
-            'certificate': forms.ClearableFileInput(attrs={'class': 'form-input'}),
+            'certificate': forms.ClearableFileInput(attrs={
+                'class': 'form-input',
+                'accept': 'application/pdf,image/*,.heic,.heif',
+            }),
         }
+
+    def clean_certificate(self):
+        certificate = self.cleaned_data.get('certificate')
+        if not certificate:
+            return certificate
+
+        extension = (certificate.name.rsplit('.', 1)[-1] if '.' in certificate.name else '').lower()
+        if extension == 'pdf':
+            certificate.seek(0)
+            if not certificate.read(5).startswith(b'%PDF-'):
+                raise forms.ValidationError('The uploaded certificate is not a valid PDF file.')
+        elif extension in {
+            'jpg', 'jpeg', 'png', 'webp', 'gif', 'bmp', 'tif', 'tiff',
+            'avif', 'heic', 'heif',
+        }:
+            try:
+                forms.ImageField().clean(certificate)
+            except forms.ValidationError as exc:
+                raise forms.ValidationError(
+                    'Upload a valid PDF or image certificate.'
+                ) from exc
+        else:
+            raise forms.ValidationError('Upload a PDF or image certificate.')
+
+        certificate.seek(0)
+        return certificate
 
 
 class SocialLinkForm(forms.ModelForm):

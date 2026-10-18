@@ -33,12 +33,13 @@ def is_serverless_runtime():
 # normal local media folder for local development.
 MEDIA_URL = '/media/'
 MEDIA_ROOT = Path('/tmp/media') if is_serverless_runtime() else BASE_DIR / 'media'
-MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+if not is_serverless_runtime():
+    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
 
-# Use Cloudinary for persistent media storage in production (Vercel) when its
-# credentials are provided via environment variables. Local development keeps
-# using the filesystem so existing local behavior is unchanged.
-_USE_CLOUDINARY = all(
+# Local development always serves existing uploads from ``media/``. On
+# serverless hosts the filesystem is ephemeral, so persistent Cloudinary
+# storage is required for uploads and for URLs backed by migrated media.
+_CLOUDINARY_CONFIGURED = all(
     os.environ.get(key)
     for key in (
         'CLOUDINARY_CLOUD_NAME',
@@ -46,6 +47,14 @@ _USE_CLOUDINARY = all(
         'CLOUDINARY_API_SECRET',
     )
 )
+_USE_CLOUDINARY = is_serverless_runtime() and _CLOUDINARY_CONFIGURED
+
+if is_serverless_runtime() and not _CLOUDINARY_CONFIGURED:
+    from django.core.exceptions import ImproperlyConfigured
+    raise ImproperlyConfigured(
+        'Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and '
+        'CLOUDINARY_API_SECRET in the serverless environment to persist media.'
+    )
 
 
 # Quick-start development settings - unsuitable for production
@@ -61,7 +70,6 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'kay-tii-tii.vercel.app',
-    'https://kay-tii-tii.vercel.app'
 ]
 
 
@@ -163,6 +171,11 @@ USE_I18N = True
 
 USE_TZ = True
 
+# Vercel serves this application over HTTPS. Keep session and CSRF cookies off
+# plaintext requests in production while leaving local HTTP development usable.
+SESSION_COOKIE_SECURE = is_serverless_runtime()
+CSRF_COOKIE_SECURE = is_serverless_runtime()
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -173,12 +186,12 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-# Media storage: Cloudinary in production (persistent across deploys/restarts),
-# local filesystem in development (unchanged behavior).
+# Media storage: Cloudinary on serverless deployments and local filesystem in
+# development, regardless of whether local Cloudinary credentials are present.
 if _USE_CLOUDINARY:
     STORAGES = {
         'default': {
-            'BACKEND': 'cloudinary_storage.storage.MediaCloudinaryStorage',
+            'BACKEND': 'myblog.storage.PortfolioMediaCloudinaryStorage',
         },
         'staticfiles': {
             'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
@@ -187,7 +200,7 @@ if _USE_CLOUDINARY:
 else:
     STORAGES = {
         'default': {
-            'BACKEND': 'django.core.files.storage.FileSystemStorage',
+            'BACKEND': 'myblog.storage.LocalHybridMediaStorage',
             'OPTIONS': {'location': str(MEDIA_ROOT)},
         },
         'staticfiles': {

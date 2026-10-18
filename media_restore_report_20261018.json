@@ -1,0 +1,173 @@
+{
+  "date": "2026-10-18",
+  "checks": [
+    {
+      "model": "Album",
+      "id": 1,
+      "field": "album_photo",
+      "name": "album_photos/FB_IMG_1705506267265.jpg",
+      "url": "/media/album_photos/FB_IMG_1705506267265.jpg",
+      "local_source": "local filesystem media route",
+      "status": 200,
+      "content_type": "image/jpeg",
+      "bytes": 93741,
+      "local_file_exists": true,
+      "backup_file_exists": true
+    },
+    {
+      "model": "Album",
+      "id": 2,
+      "field": "album_photo",
+      "name": "album_photos/canva-meme-cat-heart-cute-shy-embarrassed-CVBohzyf-nk.jpg",
+      "url": "/media/album_photos/canva-meme-cat-heart-cute-shy-embarrassed-CVBohzyf-nk.jpg",
+      "local_source": "local filesystem media route",
+      "status": 200,
+      "content_type": "image/jpeg",
+      "bytes": 183833,
+      "local_file_exists": true,
+      "backup_file_exists": true
+    },
+    {
+      "model": "Album",
+      "id": 3,
+      "field": "album_photo",
+      "name": "album_photos/pexels-photo-341970_ZBHXSXQ.webp",
+      "url": "/media/album_photos/pexels-photo-341970_ZBHXSXQ.webp",
+      "local_source": "local filesystem media route",
+      "status": 200,
+      "content_type": "image/webp",
+      "bytes": 53670,
+      "local_file_exists": true,
+      "backup_file_exists": true
+    },
+    {
+      "model": "Album",
+      "id": 6,
+      "field": "album_photo",
+      "name": "media/album_photos/1000152064_ectror",
+      "url": "https://res.cloudinary.com/khpyt0wv/image/upload/v1/media/album_photos/1000152064_ectror",
+      "local_source": "Cloudinary via local hybrid storage",
+      "status": 200,
+      "content_type": "image/webp",
+      "bytes": 637558,
+      "local_file_exists": false,
+      "backup_file_exists": false
+    },
+    {
+      "model": "AlbumImage",
+      "id": 4,
+      "field": "image",
+      "name": "media/album_photos/20261001_200939_vlacyn",
+      "url": "https://res.cloudinary.com/khpyt0wv/image/upload/v1/media/album_photos/20261001_200939_vlacyn",
+      "local_source": "Cloudinary via local hybrid storage",
+      "status": 200,
+      "content_type": "image/heic",
+      "bytes": 1900423,
+      "local_file_exists": false,
+      "backup_file_exists": false
+    },
+    {
+      "model": "Project",
+      "id": 2,
+      "field": "photo",
+      "name": "projects/Screenshot_2026-10-08_135640.png",
+      "url": "/media/projects/Screenshot_2026-10-08_135640.png",
+      "local_source": "local filesystem media route",
+      "status": 200,
+      "content_type": "image/png",
+      "bytes": 533286,
+      "local_file_exists": true,
+      "backup_file_exists": true
+    },
+    {
+      "model": "ProjectImage",
+      "id": 2,
+      "field": "image",
+      "name": "media/projects/Screenshot_2026-10-08_202317_ohysbf",
+      "url": "https://res.cloudinary.com/khpyt0wv/image/upload/v1/media/projects/Screenshot_2026-10-08_202317_ohysbf",
+      "local_source": "Cloudinary via local hybrid storage",
+      "status": 200,
+      "content_type": "image/png",
+      "bytes": 53826,
+      "local_file_exists": false,
+      "backup_file_exists": false
+    }
+  ],
+  "passed": 7,
+  "total": 7,
+  "database_snapshot": "db_media_records_backup.json",
+  "vercel_checks": [
+    {
+      "model": "Album",
+      "id": 1,
+      "field": "album_photo",
+      "name": "album_photos/FB_IMG_1705506267265.jpg",
+      "url": "https://res.cloudinary.com/khpyt0wv/image/upload/v1/media/album_photos/FB_IMG_1705506267265.jpg.jpg",
+      "status": 200,
+      "content_type": "image/jpeg",
+      "bytes": 93741
+    },
+    {
+      "model": "Album",
+      "id": 2,
+      "field": "album_photo",
+      "name": "album_photos/canva-meme-cat-heart-cute-shy-embarrassed-CVBohzyf-nk.jpg",
+      "url": "https://res.cloudinary.com/khpyt0wv/image/upload/v1/media/album_photos/canva-meme-cat-heart-cute-shy-embarrassed-CVBohzyf-nk.jpg.jpg",
+      "status": 200,
+      "content_type": "image/jpeg",
+      "bytes": 183833
+    },
+    {
+      "model": "Album",
+      "id": 3,
+      "field": "album_photo",
+      "name": "album_photos/pexels-photo-341970_ZBHXSXQ.webp",
+      "url": "https://res.cloudinary.com/khpyt0wv/image/upload/v1/media/album_photos/pexels-photo-341970_ZBHXSXQ.webp.webp",
+      "status": 200,
+      "content_type": "image/webp",
+      "bytes": 53670
+    },
+    {
+      "model": "Album",
+      "id": 6,
+      "field": "album_photo",
+      "name": "media/album_photos/1000152064_ectror",
+      "url": "https://res.cloudinary.com/khpyt0wv/image/upload/v1/media/album_photos/1000152064_ectror",
+      "status": 200,
+      "content_type": "image/webp",
+      "bytes": 637558
+    },
+    {
+      "model": "AlbumImage",
+      "id": 4,
+      "field": "image",
+      "name": "media/album_photos/20261001_200939_vlacyn",
+      "url": "https://res.cloudinary.com/khpyt0wv/image/upload/v1/media/album_photos/20261001_200939_vlacyn",
+      "status": 200,
+      "content_type": "image/heic",
+      "bytes": 1900423
+    },
+    {
+      "model": "Project",
+      "id": 2,
+      "field": "photo",
+      "name": "projects/Screenshot_2026-10-08_135640.png",
+      "url": "https://res.cloudinary.com/khpyt0wv/image/upload/v1/media/projects/Screenshot_2026-10-08_135640.png.png",
+      "status": 200,
+      "content_type": "image/png",
+      "bytes": 533286
+    },
+    {
+      "model": "ProjectImage",
+      "id": 2,
+      "field": "image",
+      "name": "media/projects/Screenshot_2026-10-08_202317_ohysbf",
+      "url": "https://res.cloudinary.com/khpyt0wv/image/upload/v1/media/projects/Screenshot_2026-10-08_202317_ohysbf",
+      "status": 200,
+      "content_type": "image/png",
+      "bytes": 53826
+    }
+  ],
+  "vercel_passed": 7,
+  "vercel_total": 7
+}

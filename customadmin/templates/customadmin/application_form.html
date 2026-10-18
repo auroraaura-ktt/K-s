@@ -30,7 +30,7 @@
                 {% if form.file.errors %}
                 <p style="font-size: 0.75rem; color: #dc2626; margin-top: 0.25rem;">{{ form.file.errors.0 }}</p>
                 {% endif %}
-                <p style="font-size: 0.75rem; color: #6b7582; margin-top: 0.25rem;">Windows .exe or Android .apk only. Max 200 MB. File type is verified by magic bytes, not extension.</p>
+                <p style="font-size: 0.75rem; color: #6b7582; margin-top: 0.25rem;">Windows .exe or Android .apk only. Max 200 MB. File content is checked for the expected executable or package structure.</p>
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">

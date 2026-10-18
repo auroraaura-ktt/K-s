@@ -1,0 +1,154 @@
+{
+  "Album": [
+    {
+      "model": "mytask.album",
+      "pk": 1,
+      "fields": {
+        "album_name": "dfdfd",
+        "album_description": "dfdfd",
+        "album_photo": "album_photos/FB_IMG_1705506267265.jpg",
+        "date_created": "2026-08-05T14:49:04.835Z"
+      }
+    },
+    {
+      "model": "mytask.album",
+      "pk": 2,
+      "fields": {
+        "album_name": "dfdfd",
+        "album_description": "dfdfdfdfdfdfd",
+        "album_photo": "album_photos/canva-meme-cat-heart-cute-shy-embarrassed-CVBohzyf-nk.jpg",
+        "date_created": "2026-08-05T15:17:39.290Z"
+      }
+    },
+    {
+      "model": "mytask.album",
+      "pk": 3,
+      "fields": {
+        "album_name": "Test",
+        "album_description": "This is only test album.",
+        "album_photo": "album_photos/pexels-photo-341970_ZBHXSXQ.webp",
+        "date_created": "2026-08-06T08:06:34.791Z"
+      }
+    },
+    {
+      "model": "mytask.album",
+      "pk": 4,
+      "fields": {
+        "album_name": "MiitVerse: A Cloud-Based Smart Social Network for  Campus Communication",
+        "album_description": "hihi",
+        "album_photo": "",
+        "date_created": "2026-08-10T16:06:58.821Z"
+      }
+    },
+    {
+      "model": "mytask.album",
+      "pk": 6,
+      "fields": {
+        "album_name": "Cloudinary Test",
+        "album_description": "",
+        "album_photo": "media/album_photos/1000152064_ectror",
+        "date_created": "2026-10-17T17:49:27.609Z"
+      }
+    }
+  ],
+  "AlbumImage": [
+    {
+      "model": "mytask.albumimage",
+      "pk": 4,
+      "fields": {
+        "album": 6,
+        "image": "media/album_photos/20261001_200939_vlacyn",
+        "order": 0
+      }
+    }
+  ],
+  "Profile": [
+    {
+      "model": "mytask.profile",
+      "pk": 1,
+      "fields": {
+        "name": "Kyaw Thein Tun",
+        "title": "Student",
+        "bio": "I'm Student.",
+        "photo": "",
+        "email": "ktt.kyawtheintun@gmail.com",
+        "phone": "09452737975",
+        "location": "Mandalay",
+        "github": "https://github.com/auroraaura-ktt",
+        "linkedin": "https://www.linkedin.com/in/kyaw-thein-tun-23515b403",
+        "twitter": "",
+        "website": "",
+        "resume": "resume/KTT.pdf",
+        "is_active": true
+      }
+    }
+  ],
+  "Project": [
+    {
+      "model": "mytask.project",
+      "pk": 2,
+      "fields": {
+        "title": "Care Connect",
+        "description": "Care Connect is designed as a comprehensive digital health record management \r\nsystem that ensures smooth interaction among three key stakeholders: patients, doctors, and \r\nadministrators. Each role is equipped with functionalities that cater to its specific needs, \r\nensuring that the system is both efficient and practical. \r\nFor patients, the system provides a convenient way to engage with healthcare services. \r\nThey can register online, book appointments with available doctors, and explore doctor profiles \r\nto make informed choices about their care. Additionally, patients can share reviews and \r\nfeedback about the clinic, helping to build trust and improve service quality. \r\nFor doctors, the system replaces the burdens of paperwork with digital record \r\nmanagement. They can access their assigned patient lists, update medical histories, and track \r\nappointment schedules. This digital workflow minimizes errors, improves accessibility, and \r\nallows doctors to dedicate more time to patient care rather than administrative tasks. \r\nFor administrators, Care Connect provides complete control through robust CRUD \r\n(Create, Read, Update, Delete) functionalities. Admins are responsible for managing the \r\nsystem, ensuring that both doctor and patient records are accurate and up to date. This \r\ncentralized control supports smooth clinic operations and allows administrators to monitor \r\noverall performance effectively. \r\nThe system has been built using Django, a Python-based web framework that \r\nemphasizes scalability, security, and maintainability. Combined with HTML and CSS, it \r\ndelivers a clean, intuitive, and responsive user interface. The backend relies on SQLite, a \r\nlightweight yet reliable database integrated with Django, which simplifies storage and retrieval \r\nof patient and doctor records. Together, these technologies ensure that the platform is not only \r\nfunctional but also adaptable to future enhancements.",
+        "photo": "projects/Screenshot_2026-10-08_135640.png",
+        "url": "https://careconnect-flame.vercel.app/",
+        "github_url": "",
+        "date_created": "2026-09-02T10:57:07.607Z",
+        "is_featured": true,
+        "role": "",
+        "client": "",
+        "status": "",
+        "technologies": "",
+        "features": "",
+        "responsibilities": "",
+        "additional_info": ""
+      }
+    }
+  ],
+  "ProjectImage": [
+    {
+      "model": "mytask.projectimage",
+      "pk": 2,
+      "fields": {
+        "project": 2,
+        "image": "media/projects/Screenshot_2026-10-08_202317_ohysbf",
+        "order": 0
+      }
+    }
+  ],
+  "Education": [
+    {
+      "model": "mytask.education",
+      "pk": 1,
+      "fields": {
+        "institution": "Myanmar Institute of Information Technology",
+        "degree": "Bechalor of Engineering (Hons)",
+        "field_of_study": "Computer Science and Engineering (CSE)",
+        "start_date": "2022-08-16",
+        "end_date": "2026-08-16",
+        "description": "",
+        "certificate": ""
+      }
+    }
+  ],
+  "Application": [
+    {
+      "model": "mytask.application",
+      "pk": 1,
+      "fields": {
+        "name": "Edunova Testing",
+        "description": "This is testing only",
+        "version": "2.0.0",
+        "platform": "windows",
+        "file": "apps/0d7ca8e1e1dc42d6bf445388f2398369.exe",
+        "original_filename": "Edunova-2.0.0.exe",
+        "file_size": 101097984,
+        "icon": "",
+        "is_published": true,
+        "is_publicly_downloadable": true,
+        "date_created": "2026-10-17T06:06:19.295Z",
+        "updated_at": "2026-10-17T06:06:19.450Z"
+      }
+    }
+  ]
+}

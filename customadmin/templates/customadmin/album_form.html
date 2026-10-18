@@ -27,8 +27,9 @@
 
             <div>
                 <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Additional Photos</label>
-                <input type="file" name="images" class="form-input" multiple>
-                <p style="font-size: 0.75rem; color: #6b7582; margin-top: 0.25rem;">Add more photos (hold Ctrl/Cmd to pick several).</p>
+                {{ form.images }}
+                {% if form.images.errors %}<p style="font-size: 0.75rem; color: #dc2626; margin-top: 0.25rem;">{{ form.images.errors.0 }}</p>{% endif %}
+                <p style="font-size: 0.75rem; color: #6b7582; margin-top: 0.25rem;">Add more photos (hold Ctrl/Cmd to pick several). JPEG, PNG, WebP, GIF, BMP, TIFF, AVIF, HEIC, and HEIF are supported.</p>
             </div>
 
             {% if object and object.images.all %}
@@ -38,7 +39,7 @@
                     {% for img in object.images.all %}
                     <div style="background: rgba(0,0,0,0.05); border-radius: 6px; padding: 0.3rem; display: flex; align-items: center; gap: 0.3rem;">
                         <img src="{{ img.image.url }}" alt="photo" style="width: 70px; height: 55px; object-fit: cover; border-radius: 4px;">
-                        <a href="{% url 'customadmin:album_image_delete' object.pk img.pk %}" class="link-del" style="font-size: 0.9rem; color: #dc2626; text-decoration: none;" title="Remove photo" onclick="return confirm('Remove this photo?')">&#215;</a>
+                        <button type="submit" form="delete-album-image-{{ img.pk }}" class="link-del" style="font-size: 0.9rem; color: #dc2626; text-decoration: none; border: 0; background: none; cursor: pointer;" title="Remove photo" onclick="return confirm('Remove this photo?')">&#215;</button>
                     </div>
                     {% endfor %}
                 </div>
@@ -48,6 +49,11 @@
 
             <button type="submit" class="btn-primary" style="width: 100%;">Save</button>
         </form>
+        {% if object %}
+            {% for img in object.images.all %}
+            <form id="delete-album-image-{{ img.pk }}" method="post" action="{% url 'customadmin:album_image_delete' object.pk img.pk %}" style="display: none;">{% csrf_token %}</form>
+            {% endfor %}
+        {% endif %}
     </div>
 </div>
 {% endblock %}

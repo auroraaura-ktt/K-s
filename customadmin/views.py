@@ -1,6 +1,7 @@
 ﻿from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponseForbidden
+from django.views.decorators.http import require_POST
 
 # Staff-only access control: returns 403 for authenticated non-staff users.
 staff_required = user_passes_test(lambda u: u.is_staff, login_url=None)
@@ -54,6 +55,7 @@ def admin_login(request):
 
 
 @login_required
+@require_POST
 def admin_logout(request):
     """Custom admin logout view."""
     logout(request)
@@ -134,9 +136,9 @@ def project_list(request):
     return render(request, 'customadmin/project_list.html', {'projects': projects})
 
 
-def _save_project_images(project, request):
+def _save_project_images(project, uploads):
     """Create a ProjectImage for each uploaded additional photo."""
-    for index, uploaded in enumerate(request.FILES.getlist('images')):
+    for index, uploaded in enumerate(uploads):
         ProjectImage.objects.create(project=project, image=uploaded, order=index)
 
 
@@ -146,7 +148,7 @@ def project_add(request):
         form = ProjectForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            _save_project_images(form.instance, request)
+            _save_project_images(form.instance, form.cleaned_data['images'])
             messages.success(request, 'Project added successfully.')
             return redirect('customadmin:project_list')
     else:
@@ -161,7 +163,7 @@ def project_edit(request, pk):
         form = ProjectForm(request.POST, request.FILES, instance=project)
         if form.is_valid():
             form.save()
-            _save_project_images(form.instance, request)
+            _save_project_images(form.instance, form.cleaned_data['images'])
             messages.success(request, 'Project updated successfully.')
             return redirect('customadmin:project_list')
     else:
@@ -290,9 +292,6 @@ def education_add(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Education added successfully.')
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Education added successfully.')
             return redirect('customadmin:education_list')
     else:
         form = EducationForm()
@@ -401,15 +400,16 @@ def message_delete(request, pk):
     })
 
 
-def _save_album_images(album, request):
+def _save_album_images(album, uploads):
     """Create an AlbumImage for each uploaded additional photo."""
-    for index, uploaded in enumerate(request.FILES.getlist('images')):
+    for index, uploaded in enumerate(uploads):
         AlbumImage.objects.create(album=album, image=uploaded, order=index)
 
 
 @login_required
+@require_POST
 def project_image_delete(request, pk, image_pk):
-    image = get_object_or_404(ProjectImage, pk=image_pk)
+    image = get_object_or_404(ProjectImage, pk=image_pk, project_id=pk)
     project = image.project
     image.delete()
     messages.success(request, 'Project photo deleted successfully.')
@@ -428,7 +428,7 @@ def album_add(request):
         form = AlbumForm(request.POST, request.FILES)
         if form.is_valid():
             album = form.save()
-            _save_album_images(album, request)
+            _save_album_images(album, form.cleaned_data['images'])
             messages.success(request, 'Album added successfully.')
             return redirect('customadmin:album_list')
     else:
@@ -443,7 +443,7 @@ def album_edit(request, pk):
         form = AlbumForm(request.POST, request.FILES, instance=album)
         if form.is_valid():
             album = form.save()
-            _save_album_images(album, request)
+            _save_album_images(album, form.cleaned_data['images'])
             messages.success(request, 'Album updated successfully.')
             return redirect('customadmin:album_list')
     else:
@@ -464,8 +464,9 @@ def album_delete(request, pk):
 
 
 @login_required
+@require_POST
 def album_image_delete(request, pk, image_pk):
-    image = get_object_or_404(AlbumImage, pk=image_pk)
+    image = get_object_or_404(AlbumImage, pk=image_pk, album_id=pk)
     album = image.album
     image.delete()
     messages.success(request, 'Album photo deleted successfully.')

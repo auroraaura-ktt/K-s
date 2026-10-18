@@ -33,7 +33,10 @@
                     Logged in as <span style="font-weight: 600;">{{ user.username }}</span>
                 </span>
                 <a href="{% url 'home' %}" style="background: rgba(255,255,255,0.15); color: white; padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.875rem; font-weight: 600; text-decoration: none; border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease;" class="btn-outline">View Site</a>
-                <a href="{% url 'customadmin:logout' %}" style="color: rgba(255,255,255,0.9); text-decoration: none; font-size: 0.875rem; font-weight: 600; transition: color 0.3s ease;">Logout</a>
+                <form method="post" action="{% url 'customadmin:logout' %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="color: rgba(255,255,255,0.9); text-decoration: none; font-size: 0.875rem; font-weight: 600; transition: color 0.3s ease; border: 0; background: transparent; padding: 0; cursor: pointer;">Logout</button>
+                </form>
             </div>
             {% endif %}
         </nav>

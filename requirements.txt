@@ -30,6 +30,7 @@ numpy==2.4.6
 packaging==26.2
 pandas==3.0.3
 pillow==12.2.0
+pillow-heif==1.8.1
 psycopg==3.3.4
 psycopg-binary==3.3.4
 psycopg2-binary==2.9.12

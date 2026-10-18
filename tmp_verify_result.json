@@ -1,0 +1,44 @@
+{
+  "all_ok": false,
+  "results": [
+    {
+      "label": "Album.id=1.album_photo",
+      "stored_name": "album_photos/FB_IMG_1705506267265.jpg",
+      "exists": false,
+      "url": "https://res.cloudinary.com/khpyt0wv/image/upload/v1/media/album_photos/FB_IMG_1705506267265.jpg",
+      "http_status": null,
+      "error": "ReadTimeout(ReadTimeoutError(\"HTTPSConnectionPool(host='res.cloudinary.com', port=443): Read timed out. (read timeout=25)\"))",
+      "ok": false
+    },
+    {
+      "label": "Album.id=2.album_photo",
+      "stored_name": "album_photos/canva-meme-cat-heart-cute-shy-embarrassed-CVBohzyf-nk.jpg",
+      "exists": false,
+      "url": "https://res.cloudinary.com/khpyt0wv/image/upload/v1/media/album_photos/canva-meme-cat-heart-cute-shy-embarrassed-CVBohzyf-nk.jpg",
+      "http_status": 404,
+      "content_type": "application/json; charset=UTF-8",
+      "bytes": 336,
+      "ok": false
+    },
+    {
+      "label": "Album.id=3.album_photo",
+      "stored_name": "album_photos/pexels-photo-341970_ZBHXSXQ.webp",
+      "exists": false,
+      "url": "https://res.cloudinary.com/khpyt0wv/image/upload/v1/media/album_photos/pexels-photo-341970_ZBHXSXQ.webp",
+      "http_status": 404,
+      "content_type": "application/json; charset=UTF-8",
+      "bytes": 285,
+      "ok": false
+    },
+    {
+      "label": "Project.id=2.photo",
+      "stored_name": "projects/Screenshot_2026-10-08_135640.png",
+      "exists": false,
+      "url": "https://res.cloudinary.com/khpyt0wv/image/upload/v1/media/projects/Screenshot_2026-10-08_135640.png",
+      "http_status": 404,
+      "content_type": "application/json; charset=UTF-8",
+      "bytes": 278,
+      "ok": false
+    }
+  ]
+}
