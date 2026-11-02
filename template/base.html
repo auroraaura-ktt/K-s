@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Kay Tii Tii - Personal Portfolio Website">
-    <title>{% block title %}Kay Tii Tii | Developer & Designer{% endblock %}</title>
+    <meta name="description" content="K's | Kay Tii Tii - Personal Portfolio Website by K's">
+    <title>{% block title %}K's - Kay Tii Tii | Developer & Designer{% endblock %}</title>
     {% load static %}
-    <link rel="icon" type="image/png" href="{% static "K's.png" %}">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <!-- Design CSS -->
     <link href="{% static 'css/design.css' %}" rel="stylesheet">
     <!-- Google Font -->
@@ -23,7 +23,7 @@
 <header class="navbar">
     <div class="nav-container">
         <a href="{% url 'home' %}" class="logo">
-            <img src="{% static "branding/K's.png" %}" alt="{% if site_profile %}{{ site_profile.name }}{% else %}kay_tii_tii{% endif %}">
+            <img src="{% static "K's.png" %}" alt="{% if site_profile %}{{ site_profile.name }}{% else %}kay_tii_tii{% endif %}">
         </a>
 
         <nav class="nav-menu" id="navMenu">
@@ -94,7 +94,7 @@
 <footer>
     <div class="footer-container">
         <div class="footer-logo">
-            <img src="{% static 'logo.png' %}" alt="Logo">
+            <img src="{% static "K's.png" %}" alt="Logo">
             <span>{% if site_profile %}{{ site_profile.name }}{% else %}kay_tii_tii__{% endif %}</span>
         </div>
         <p>&copy; 2026 Kay Tii Tii. All rights reserved.</p>

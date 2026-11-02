@@ -9,8 +9,14 @@ from django.urls import path, include
 from mytask import views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve as serve_static_file
 
 urlpatterns = [
+    path(
+        'favicon.ico',
+        serve_static_file,
+        {'document_root': settings.BASE_DIR / 'public', 'path': 'favicon.ico'},
+    ),
     path('admin/', admin.site.urls),
     path('myadmin/', include('customadmin.urls', namespace='customadmin')),
     path('', views.home, name='home'),
