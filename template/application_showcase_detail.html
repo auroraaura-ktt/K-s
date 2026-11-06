@@ -1,0 +1,485 @@
+{% load app_formatting %}
+
+{% if preview %}
+<div role="status" class="app-preview-notice">
+    Admin preview: this page is visible only to authorized staff. Publishing is controlled in Apps Management.
+    <a href="{% url 'customadmin:application_edit' app.pk %}">Return to edit</a>
+</div>
+{% else %}
+<a href="{% url 'apps' %}" class="app-back-link">
+    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+    <span>Back to Applications</span>
+</a>
+{% endif %}
+<div class="breadcrumbs">
+    <a href="{% url 'projects' %}">Projects</a>
+    <span aria-hidden="true">›</span>
+    <a href="{% url 'apps' %}">Applications</a>
+    <span aria-hidden="true">›</span>
+    <b>{{ app.name }}</b>
+</div>
+<article class="app-details-card">
+            <header class="app-detail-header">
+                <div class="app-detail-identity">
+                    {% if app.icon %}
+                    <img class="app-detail-icon" src="{{ app.icon.url }}" alt="{{ app.name }} icon" width="104" height="104" fetchpriority="high">
+                    {% else %}
+                    <span class="app-detail-icon app-platform-icon" aria-hidden="true">
+                        {% if app.platform == 'windows' %}<i class="fa-brands fa-windows"></i>{% elif app.platform == 'android' %}<i class="fa-brands fa-android"></i>{% elif app.platform == 'web' %}<i class="fa-solid fa-globe"></i>{% else %}<i class="fa-solid fa-cube"></i>{% endif %}
+                    </span>
+                    {% endif %}
+                    <div class="app-detail-heading">
+                        <h1>{{ app.name }}</h1>
+                        {% if app.short_description %}<p class="app-detail-intro">{{ app.short_description }}</p>{% endif %}
+                        <div class="app-tags">
+                            <span class="app-tag">{{ app.get_platform_display }}</span>
+                            {% if app.category %}<span class="app-tag">{{ app.category }}</span>{% endif %}
+                            {% if app.version %}<span class="app-tag">Version {{ app.version }}</span>{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="app-detail-actions">
+                    {% if not preview and download_url %}
+                    <div class="app-download-area">
+                        <button class="app-action-button app-action-primary" type="button" data-download-toggle aria-haspopup="true" aria-expanded="false">
+                            <i class="fa-solid fa-download" aria-hidden="true"></i>
+                            {% if app.platform == 'android' %}Download APK{% elif app.platform == 'windows' %}Download EXE{% else %}Download{% endif %}
+                            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                        </button>
+                        <div class="app-download-menu" data-download-menu hidden>
+                            {% if file_download_url %}
+                            <a href="{{ file_download_url }}" download>
+                                <i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i>
+                                {% if app.platform == 'android' %}Download APK{% elif app.platform == 'windows' %}Download EXE{% else %}Download application{% endif %}
+                                {% if app.file_size %}<span>({{ app.file_size|filesizeformat }})</span>{% endif %}
+                            </a>
+                            <button type="button" data-copy-value="{{ file_download_url }}" data-copy-label="Download link">
+                                <i class="fa-regular fa-copy" aria-hidden="true"></i> Copy Download Link
+                            </button>
+                            {% endif %}
+                            {% if external_download_url %}
+                            <a href="{{ external_download_url }}" target="_blank" rel="noopener noreferrer">
+                                <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> External download
+                            </a>
+                            {% if not file_download_url %}
+                            <button type="button" data-copy-value="{{ external_download_url }}" data-copy-label="Download link">
+                                <i class="fa-regular fa-copy" aria-hidden="true"></i> Copy Download Link
+                            </button>
+                            {% endif %}
+                            {% endif %}
+                            {% if app.safe_website_url %}
+                            <a href="{{ app.safe_website_url }}" target="_blank" rel="noopener noreferrer">
+                                <i class="fa-solid fa-globe" aria-hidden="true"></i> Visit website
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if not preview and not download_url and app.safe_website_url %}
+                    <a href="{{ app.safe_website_url }}" class="app-action-button app-action-primary" target="_blank" rel="noopener noreferrer">
+                        <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Visit website
+                    </a>
+                    {% endif %}
+                </div>
+            </header>
+
+            {% if app.images.all %}
+            <section class="app-detail-section app-gallery-section" aria-labelledby="app-screenshots-heading">
+                <div class="app-section-heading">
+                    <h2 id="app-screenshots-heading">Screenshots</h2>
+                    <p>Explore screenshots for {{ app.name }}.</p>
+                </div>
+                <div class="app-gallery" data-app-gallery>
+                    <div class="app-gallery-stage">
+                        {% for image in app.images.all %}
+                        <img
+                            class="app-gallery-image{% if not forloop.first %} app-gallery-image-hidden{% endif %}"
+                            src="{{ image.image.url }}"
+                            alt="{{ app.name }} screenshot {{ forloop.counter }}"
+                            data-gallery-image
+                            data-image-url="{{ image.image.url }}"
+                            data-image-index="{{ forloop.counter0 }}"
+                            role="button"
+                            tabindex="0"
+                            aria-label="View screenshot {{ forloop.counter }} larger"
+                            loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+                            decoding="async"
+                            {% if forloop.first %}fetchpriority="high"{% endif %}
+                        >
+                        {% endfor %}
+                        <p class="app-gallery-empty" data-gallery-empty hidden>Screenshots are currently unavailable.</p>
+                        {% if app.images.count > 1 %}
+                        <button class="app-gallery-arrow app-gallery-prev" type="button" data-gallery-prev aria-label="Previous screenshot">
+                            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+                        </button>
+                        <button class="app-gallery-arrow app-gallery-next" type="button" data-gallery-next aria-label="Next screenshot">
+                            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% if app.images.count > 1 %}
+                    <div class="app-gallery-thumbnails" role="group" aria-label="Choose a screenshot">
+                        {% for image in app.images.all %}
+                        <button
+                            class="app-gallery-thumb{% if forloop.first %} is-active{% endif %}"
+                            type="button"
+                            data-gallery-thumb
+                            data-image-index="{{ forloop.counter0 }}"
+                            aria-label="Show screenshot {{ forloop.counter }}"
+                            aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+                        >
+                            <img src="{{ image.image.url }}" alt="" loading="lazy" decoding="async">
+                        </button>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% if app.images.all %}
+                    <div class="app-gallery-dots" role="group" aria-label="Select screenshot">
+                        {% for image in app.images.all %}
+                        <button
+                            type="button"
+                            class="{% if forloop.first %}is-active{% endif %}"
+                            data-gallery-dot
+                            data-image-index="{{ forloop.counter0 }}"
+                            aria-label="Show screenshot {{ forloop.counter }}"
+                            aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+                        ></button>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <button class="app-gallery-open" type="button" data-gallery-open>
+                        <i class="fa-solid fa-expand" aria-hidden="true"></i> View larger
+                    </button>
+                </div>
+            </section>
+            {% endif %}
+
+            <section class="app-detail-section app-information-section" aria-label="Application information">
+                <div class="app-info-layout">
+                    <div class="app-info-main">
+                <div class="app-tabs" role="tablist" aria-label="Application details">
+                    {% if app.description or app.short_description %}
+                    <button class="app-tab{% if active_tab == 'about' %} is-active{% endif %}" id="app-tab-about" type="button" role="tab" aria-controls="app-panel-about" aria-selected="{% if active_tab == 'about' %}true{% else %}false{% endif %}" data-app-tab="about">
+                        About
+                    </button>
+                    {% endif %}
+                    {% if app.feature_list %}
+                    <button class="app-tab{% if active_tab == 'features' %} is-active{% endif %}" id="app-tab-features" type="button" role="tab" aria-controls="app-panel-features" aria-selected="{% if active_tab == 'features' %}true{% else %}false{% endif %}" data-app-tab="features">
+                        Features
+                    </button>
+                    {% endif %}
+                    <button class="app-tab{% if active_tab == 'details' %} is-active{% endif %}" id="app-tab-details" type="button" role="tab" aria-controls="app-panel-details" aria-selected="{% if active_tab == 'details' %}true{% else %}false{% endif %}" data-app-tab="details">
+                        Details
+                    </button>
+                    {% if app.images.all %}
+                    <button class="app-tab" id="app-tab-screenshots" type="button" role="tab" aria-controls="app-panel-screenshots" aria-selected="false" data-app-tab="screenshots">
+                        Screenshots
+                    </button>
+                    {% endif %}
+                </div>
+
+                {% if app.description or app.short_description %}
+                <section class="app-tab-panel" id="app-panel-about" role="tabpanel" aria-labelledby="app-tab-about" data-app-panel="about"{% if active_tab != 'about' %} hidden{% endif %}>
+                    <div class="app-section-heading"><h2>About this application</h2></div>
+                    {% if app.description %}
+                    <div class="app-description">{{ app.description|format_app_description }}</div>
+                    {% else %}
+                    <p class="app-description">{{ app.short_description }}</p>
+                    {% endif %}
+                </section>
+                {% endif %}
+
+                {% if app.feature_list %}
+                <section class="app-tab-panel" id="app-panel-features" role="tabpanel" aria-labelledby="app-tab-features" data-app-panel="features"{% if active_tab != 'features' %} hidden{% endif %}>
+                    <div class="app-section-heading"><h2>Features</h2></div>
+                    <ul class="app-feature-list">
+                        {% for feature in app.feature_list %}
+                        <li><i class="fa-solid fa-circle-check" aria-hidden="true"></i>{{ feature }}</li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                {% endif %}
+
+                <section class="app-tab-panel" id="app-panel-details" role="tabpanel" aria-labelledby="app-tab-details" data-app-panel="details"{% if active_tab != 'details' %} hidden{% endif %}>
+                    <div class="app-section-heading"><h2>Application details</h2></div>
+                    <dl class="app-information-list">
+                        <div><dt>Platform</dt><dd>{{ app.get_platform_display }}</dd></div>
+                        {% if app.category %}<div><dt>Category</dt><dd>{{ app.category }}</dd></div>{% endif %}
+                        {% if app.version %}<div><dt>Version</dt><dd>{{ app.version }}</dd></div>{% endif %}
+                        {% if app.technologies %}<div><dt>Technologies</dt><dd>{{ app.technologies|linebreaksbr }}</dd></div>{% endif %}
+                    </dl>
+                </section>
+
+                {% if app.images.all %}
+                <section class="app-tab-panel" id="app-panel-screenshots" role="tabpanel" aria-labelledby="app-tab-screenshots" data-app-panel="screenshots" hidden>
+                    <div class="app-section-heading">
+                        <h2>Application screenshots</h2>
+                        <p>Explore the screenshot carousel above.</p>
+                    </div>
+                </section>
+                {% endif %}
+                    </div>
+
+                    {% if not preview %}
+                    <aside class="app-side-info">
+                        <h3>App Information</h3>
+                        {% if app.version %}<div class="app-side-row"><span>Version</span><strong>{{ app.version }}</strong></div>{% endif %}
+                        <div class="app-side-row"><span>Platform</span><strong>{{ app.get_platform_display }}</strong></div>
+                        {% if app.category %}<div class="app-side-row"><span>Category</span><strong>{{ app.category }}</strong></div>{% endif %}
+                        {% if app.technologies %}<div class="app-side-row"><span>Technologies</span><strong>{{ app.technologies|linebreaksbr }}</strong></div>{% endif %}
+                        <div class="app-share-box">
+                            <h3>Share This App</h3>
+                            <div class="app-share-buttons">
+                                <button type="button" data-copy-value="{{ app_url }}" data-copy-label="App URL" aria-label="Copy app URL">
+                                    <i class="fa-solid fa-link" aria-hidden="true"></i>
+                                </button>
+                                <a href="https://www.facebook.com/sharer/sharer.php?u={{ app_url|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook">
+                                    <i class="fa-brands fa-facebook" aria-hidden="true"></i>
+                                </a>
+                                <a href="https://t.me/share/url?url={{ app_url|urlencode }}" target="_blank" rel="noopener noreferrer" aria-label="Share on Telegram">
+                                    <i class="fa-brands fa-telegram" aria-hidden="true"></i>
+                                </a>
+                                <button type="button" data-share-app data-share-title="{{ app.name }}" aria-label="Share application">
+                                    <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </aside>
+                    {% endif %}
+                </div>
+            </section>
+</article>
+
+<dialog class="app-lightbox" data-gallery-dialog aria-label="Expanded application screenshots">
+    <button class="app-lightbox-close" type="button" data-gallery-close aria-label="Close screenshot viewer">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+    </button>
+    <button class="app-lightbox-arrow app-lightbox-prev" type="button" data-lightbox-prev aria-label="Previous screenshot">
+        <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+    </button>
+    <img class="app-lightbox-image" data-lightbox-image alt="">
+    <button class="app-lightbox-arrow app-lightbox-next" type="button" data-lightbox-next aria-label="Next screenshot">
+        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+    </button>
+    <p class="app-lightbox-count" data-lightbox-count aria-live="polite"></p>
+</dialog>
+<p class="app-toast" data-app-toast role="status" aria-live="polite"></p>
+<script>
+(() => {
+    const tabs = [...document.querySelectorAll('[data-app-tab]')];
+    const panels = [...document.querySelectorAll('[data-app-panel]')];
+    const activateTab = (tab) => {
+        tabs.forEach((item) => {
+            const active = item === tab;
+            item.classList.toggle('is-active', active);
+            item.setAttribute('aria-selected', String(active));
+            item.tabIndex = active ? 0 : -1;
+        });
+        panels.forEach((panel) => { panel.hidden = panel.dataset.appPanel !== tab.dataset.appTab; });
+    };
+    tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => activateTab(tab));
+        tab.addEventListener('keydown', (event) => {
+            let nextIndex = index;
+            if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
+            else if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
+            else if (event.key === 'Home') nextIndex = 0;
+            else if (event.key === 'End') nextIndex = tabs.length - 1;
+            else return;
+            event.preventDefault();
+            tabs[nextIndex].focus();
+            activateTab(tabs[nextIndex]);
+        });
+    });
+
+    const toast = document.querySelector('[data-app-toast]');
+    let toastTimer;
+    const showToast = (message) => {
+        if (!toast) return;
+        toast.textContent = message;
+        toast.classList.add('is-visible');
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 2400);
+    };
+    const copyText = async (value, label) => {
+        if (!value) {
+            showToast(`${label} is unavailable.`);
+            return;
+        }
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(value);
+            } else {
+                const field = document.createElement('textarea');
+                field.value = value;
+                field.setAttribute('readonly', '');
+                field.style.position = 'fixed';
+                field.style.opacity = '0';
+                document.body.appendChild(field);
+                field.select();
+                const copied = document.execCommand('copy');
+                field.remove();
+                if (!copied) throw new Error('Clipboard copy was rejected.');
+            }
+            showToast(`${label} copied.`);
+        } catch (error) {
+            showToast(`Could not copy the ${label.toLowerCase()}.`);
+        }
+    };
+    document.querySelectorAll('[data-copy-value]').forEach((button) => {
+        button.addEventListener('click', () => copyText(button.dataset.copyValue, button.dataset.copyLabel));
+    });
+
+    const shareButton = document.querySelector('[data-share-app]');
+    if (shareButton) {
+        shareButton.addEventListener('click', async () => {
+            const urlButton = document.querySelector('[data-copy-label="App URL"]');
+            const url = urlButton?.dataset.copyValue;
+            if (navigator.share && url) {
+                try {
+                    await navigator.share({ title: shareButton.dataset.shareTitle, url });
+                } catch (error) {
+                    if (error.name !== 'AbortError') showToast('Could not share this application.');
+                }
+            } else {
+                await copyText(url, 'App URL');
+            }
+        });
+    }
+
+    const downloadToggle = document.querySelector('[data-download-toggle]');
+    const downloadMenu = document.querySelector('[data-download-menu]');
+    if (downloadToggle && downloadMenu) {
+        const closeMenu = () => {
+            downloadMenu.hidden = true;
+            downloadToggle.setAttribute('aria-expanded', 'false');
+        };
+        downloadToggle.addEventListener('click', () => {
+            const open = downloadMenu.hidden;
+            downloadMenu.hidden = !open;
+            downloadToggle.setAttribute('aria-expanded', String(open));
+        });
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.app-download-area')) closeMenu();
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') closeMenu();
+        });
+    }
+
+    const gallery = document.querySelector('[data-app-gallery]');
+    const dialog = document.querySelector('[data-gallery-dialog]');
+    if (!gallery || !dialog) return;
+
+    const images = [...gallery.querySelectorAll('[data-gallery-image]')];
+    const thumbnails = [...gallery.querySelectorAll('[data-gallery-thumb]')];
+    const dots = [...gallery.querySelectorAll('[data-gallery-dot]')];
+    const expanded = dialog.querySelector('[data-lightbox-image]');
+    const count = dialog.querySelector('[data-lightbox-count]');
+    const stage = gallery.querySelector('.app-gallery-stage');
+    let activeIndex = 0;
+    let touchStartX = null;
+    const availableImages = () => images.filter((image) => !image.dataset.unavailable);
+    const updateNavigation = () => {
+        const hasMultiple = availableImages().length > 1;
+        gallery.querySelectorAll('[data-gallery-prev], [data-gallery-next], [data-lightbox-prev], [data-lightbox-next]')
+            .forEach((button) => { button.hidden = !hasMultiple; });
+        gallery.querySelectorAll('[data-gallery-thumb]').forEach((button) => { button.hidden = !hasMultiple; });
+        dots.forEach((button) => { button.hidden = !hasMultiple; });
+        const dotList = gallery.querySelector('.app-gallery-dots');
+        if (dotList) dotList.hidden = !hasMultiple;
+        const thumbnailStrip = gallery.querySelector('.app-gallery-thumbnails');
+        if (thumbnailStrip) thumbnailStrip.hidden = !hasMultiple;
+        const openButton = gallery.querySelector('[data-gallery-open]');
+        if (openButton) openButton.hidden = !availableImages().length;
+    };
+    const setActiveImage = (index) => {
+        const available = availableImages();
+        if (!available.length) {
+            gallery.querySelector('[data-gallery-empty]').hidden = false;
+            expanded.removeAttribute('src');
+            updateNavigation();
+            if (dialog.open) dialog.close();
+            return;
+        }
+        const requestedImage = images[index];
+        const image = requestedImage && !requestedImage.dataset.unavailable ? requestedImage : available[0];
+        activeIndex = images.indexOf(image);
+        images.forEach((item) => item.classList.toggle('app-gallery-image-hidden', item !== image));
+        thumbnails.forEach((thumb, thumbIndex) => {
+            const active = thumbIndex === activeIndex;
+            thumb.classList.toggle('is-active', active);
+            thumb.setAttribute('aria-pressed', String(active));
+            if (active) thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+        });
+        dots.forEach((dot, dotIndex) => {
+            const active = dotIndex === activeIndex;
+            dot.classList.toggle('is-active', active);
+            dot.setAttribute('aria-pressed', String(active));
+        });
+        expanded.src = image.dataset.imageUrl;
+        expanded.alt = image.alt;
+        count.textContent = `${available.indexOf(image) + 1} / ${available.length}`;
+        updateNavigation();
+    };
+    const move = (offset) => {
+        const available = availableImages();
+        const current = available.indexOf(images[activeIndex]);
+        const next = (current + offset + available.length) % available.length;
+        setActiveImage(images.indexOf(available[next]));
+    };
+    const openViewer = () => {
+        setActiveImage(activeIndex);
+        if (typeof dialog.showModal === 'function') dialog.showModal();
+    };
+
+    images.forEach((image, index) => {
+        image.addEventListener('error', () => {
+            image.dataset.unavailable = 'true';
+            image.classList.add('app-gallery-image-hidden');
+            if (thumbnails[index]) thumbnails[index].hidden = true;
+            setActiveImage(activeIndex);
+        });
+        if (image.complete && !image.naturalWidth) image.dispatchEvent(new Event('error'));
+    });
+    thumbnails.forEach((thumb) => {
+        thumb.addEventListener('click', () => setActiveImage(Number(thumb.dataset.imageIndex)));
+    });
+    dots.forEach((dot) => {
+        dot.addEventListener('click', () => setActiveImage(Number(dot.dataset.imageIndex)));
+    });
+    gallery.querySelector('[data-gallery-prev]')?.addEventListener('click', () => move(-1));
+    gallery.querySelector('[data-gallery-next]')?.addEventListener('click', () => move(1));
+    gallery.querySelector('[data-gallery-open]')?.addEventListener('click', openViewer);
+    gallery.querySelector('.app-gallery-stage')?.addEventListener('click', (event) => {
+        if (event.target.matches('[data-gallery-image]')) openViewer();
+    });
+    dialog.querySelector('[data-gallery-close]').addEventListener('click', () => dialog.close());
+    dialog.querySelector('[data-lightbox-prev]').addEventListener('click', () => move(-1));
+    dialog.querySelector('[data-lightbox-next]').addEventListener('click', () => move(1));
+    dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) dialog.close();
+    });
+    dialog.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft') move(-1);
+        if (event.key === 'ArrowRight') move(1);
+    });
+    expanded.addEventListener('touchstart', (event) => {
+        touchStartX = event.changedTouches[0].clientX;
+    }, { passive: true });
+    expanded.addEventListener('touchend', (event) => {
+        if (touchStartX === null) return;
+        const delta = event.changedTouches[0].clientX - touchStartX;
+        if (Math.abs(delta) > 45) move(delta < 0 ? 1 : -1);
+        touchStartX = null;
+    }, { passive: true });
+    stage.addEventListener('keydown', (event) => {
+        if (event.target.matches('[data-gallery-image]') && (event.key === 'Enter' || event.key === ' ')) {
+            event.preventDefault();
+            openViewer();
+        }
+    });
+    setActiveImage(0);
+})();
+</script>

@@ -1,8 +1,22 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.db.models import Prefetch
 from django.contrib import messages
 from django.http import Http404, FileResponse
+from django.urls import reverse
 
-from .models import Application, Project, Profile, Skill, Experience, Education, ContactMessage, Album, SocialLink
+from .models import (
+    Application,
+    Project,
+    Profile,
+    Skill,
+    Experience,
+    Education,
+    ContactMessage,
+    Album,
+    SocialLink,
+    PerspectivePage,
+    PerspectiveSection,
+)
 from .forms import ContactForm
 
 
@@ -38,6 +52,21 @@ def about(request):
         'experiences': experiences,
         'educations': educations,
     })
+
+
+def perspective(request):
+    """Show the published personal perspective page."""
+    page = get_object_or_404(
+        PerspectivePage.objects.prefetch_related(
+            Prefetch(
+                "sections",
+                queryset=PerspectiveSection.objects.filter(is_published=True),
+            ),
+        ),
+        pk=1,
+        is_published=True,
+    )
+    return render(request, "more_about_me.html", {"perspective_page": page})
 
 
 def education(request):
@@ -126,23 +155,60 @@ def contact(request):
 
 
 def apps(request):
-    """Public Apps listing page (published applications only)."""
+    """Public application catalog with published records only."""
     profile = get_active_profile()
-    applications = Application.objects.filter(is_published=True).order_by('-date_created')
+    applications = (
+        Application.objects.filter(is_published=True)
+        .prefetch_related('images')
+        .order_by('-date_created')
+    )
     return render(request, 'apps.html', {
         'profile': profile,
         'applications': applications,
     })
 
 
-def app_detail(request, app_id):
-    """Single application detail page (published applications only)."""
-    profile = get_active_profile()
-    app = get_object_or_404(Application, id=app_id, is_published=True)
-    return render(request, 'app_detail.html', {
+def _application_detail_context(request, profile, app):
+    """Build the detail context for one published application."""
+    can_download = app.is_publicly_downloadable
+    file_download_url = ''
+    external_download_url = ''
+    if can_download:
+        if app.file:
+            file_download_url = request.build_absolute_uri(
+                reverse('app_download', kwargs={'app_id': app.pk})
+            )
+        external_download_url = app.safe_download_url
+
+    active_tab = (
+        'about' if app.description or app.short_description
+        else 'features' if app.feature_list
+        else 'details'
+    )
+    return {
         'profile': profile,
         'app': app,
-    })
+        'app_url': request.build_absolute_uri(
+            reverse('app_detail', kwargs={'app_id': app.pk})
+        ),
+        'file_download_url': file_download_url,
+        'external_download_url': external_download_url,
+        'download_url': file_download_url or external_download_url,
+        'active_tab': active_tab,
+    }
+
+
+def app_detail(request, app_id):
+    """Open a standalone detail page for one published application."""
+    profile = get_active_profile()
+    app = get_object_or_404(
+        Application.objects.prefetch_related('images'),
+        id=app_id,
+        is_published=True,
+    )
+    return render(request, 'app_detail.html', _application_detail_context(
+        request, profile, app
+    ))
 
 
 def app_download(request, app_id):
@@ -164,7 +230,10 @@ def app_download(request, app_id):
     # Serve as an attachment so the browser downloads the binary instead of
     # attempting to display or execute it. Content-Type is forced to a generic
     # binary type and MIME sniffing is disabled.
-    file = app.file.open('rb')
+    try:
+        file = app.file.open('rb')
+    except FileNotFoundError as exc:
+        raise Http404('The application file is no longer available.') from exc
     response = FileResponse(
         file,
         as_attachment=True,

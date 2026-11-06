@@ -1,0 +1,115 @@
+{% extends 'customadmin/base.html' %}
+
+{% block title %}More About Me{% endblock %}
+
+{% block content %}
+<div style="max-width: 56rem; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+        <div>
+            <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--color-text);">More About Me</h1>
+            <p style="color: #6b7280; margin-top: 0.35rem;">Edit the introduction and ordered sections visitors see.</p>
+        </div>
+        <a href="{% url 'perspective' %}" class="btn-secondary">View page</a>
+    </div>
+
+    <form method="post" class="card" style="padding: 1.5rem;">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div style="display: grid; gap: 1rem;">
+            <div>
+                <label for="{{ form.title.id_for_label }}" class="form-label">Page title</label>
+                {{ form.title }}
+                {{ form.title.errors }}
+            </div>
+            <div>
+                <label for="{{ form.introduction.id_for_label }}" class="form-label">Introduction</label>
+                {{ form.introduction }}
+                {{ form.introduction.errors }}
+            </div>
+            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                {{ form.is_published }}
+                <span>Published (visible to the public)</span>
+            </label>
+            {{ form.is_published.errors }}
+        </div>
+
+        <hr style="margin: 1.5rem 0; border: 0; border-top: 1px solid #e5e7eb;">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+            <div>
+                <h2 style="font-size: 1.15rem; color: var(--color-text);">Sections</h2>
+                <p style="color: #6b7280; margin-top: 0.25rem;">Edit, publish, and order sections. Deleting a section requires confirmation.</p>
+            </div>
+            <button type="button" class="btn-primary" id="add-perspective-section">+ Add Section</button>
+        </div>
+        {{ section_formset.management_form }}
+        {{ section_formset.non_form_errors }}
+        <div id="perspective-sections" style="display: grid; gap: 1rem;">
+            {% for section_form in section_formset %}
+            <fieldset style="border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1rem;">
+                <legend style="padding: 0 0.35rem; font-weight: 600; color: var(--color-text);">Section {{ forloop.counter }}</legend>
+                {% for hidden in section_form.hidden_fields %}{{ hidden }}{% endfor %}
+                {% for field in section_form.visible_fields %}
+                    {% if field.name == 'DELETE' %}
+                    <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem;">
+                        {{ field }} <span>Delete this section</span>
+                    </label>
+                    {% else %}
+                    <div style="margin-top: 0.75rem;">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {{ field.errors }}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                {{ section_form.non_field_errors }}
+            </fieldset>
+            {% endfor %}
+        </div>
+        <template id="empty-perspective-section">
+            <fieldset style="border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1rem;">
+                <legend style="padding: 0 0.35rem; font-weight: 600; color: var(--color-text);">New section</legend>
+                {% for hidden in section_formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+                {% for field in section_formset.empty_form.visible_fields %}
+                    {% if field.name == 'DELETE' %}
+                    <label style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem;">
+                        {{ field }} <span>Delete this section</span>
+                    </label>
+                    {% else %}
+                    <div style="margin-top: 0.75rem;">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {{ field.errors }}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </fieldset>
+        </template>
+
+        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1.5rem;">Save More About Me</button>
+    </form>
+</div>
+<script>
+    (() => {
+        const addButton = document.getElementById('add-perspective-section');
+        const sections = document.getElementById('perspective-sections');
+        const template = document.getElementById('empty-perspective-section');
+        const totalForms = document.getElementById('id_sections-TOTAL_FORMS');
+        const form = addButton.closest('form');
+
+        addButton.addEventListener('click', () => {
+            const index = Number(totalForms.value);
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = template.innerHTML.replaceAll('__prefix__', String(index));
+            sections.append(wrapper.firstElementChild);
+            totalForms.value = String(index + 1);
+        });
+
+        form.addEventListener('submit', (event) => {
+            const deletedSections = form.querySelectorAll('input[name$="-DELETE"]:checked');
+            if (deletedSections.length && !window.confirm('Permanently delete the selected section(s)?')) {
+                event.preventDefault();
+            }
+        });
+    })();
+</script>
+{% endblock %}

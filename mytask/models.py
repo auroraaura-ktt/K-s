@@ -1,4 +1,6 @@
 import re
+import ipaddress
+from urllib.parse import urlsplit
 
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
@@ -73,14 +75,19 @@ def sanitize_external_url(value):
     except ValidationError:
         return ''
 
-    # Reject credentials embedded in the URL and private/loopback hosts.
-    remainder = url.split('://', 1)[-1]
-    if remainder.split('@')[-1] != remainder:
+    parsed = urlsplit(url)
+    if parsed.username or parsed.password:
         return ''
 
-    host = remainder.split('/', 1)[0].split('?', 1)[0].split('#', 1)[0]
-    host = host.rsplit(':', 1)[0] if host.count(':') == 1 else host
-    if not host or _PRIVATE_URL_HOSTS.match(host):
+    host = (parsed.hostname or '').rstrip('.').lower()
+    if not host or host == 'localhost' or host.endswith(('.localhost', '.local', '.internal')):
+        return ''
+
+    try:
+        address = ipaddress.ip_address(host)
+    except ValueError:
+        address = None
+    if address and not address.is_global:
         return ''
 
     return url
@@ -372,19 +379,38 @@ def app_upload_path(instance, filename):
     return f'apps/{uuid.uuid4().hex}.{extension}'
 
 
+def application_image_upload_path(instance, filename):
+    """Keep uploaded screenshot names and storage keys opaque."""
+    extension = filename.rsplit('.', 1)[-1].lower()
+    return f'app-screenshots/{uuid.uuid4().hex}.{extension}'
+
+
 class Application(models.Model):
-    """Downloadable Windows or Android application in the single-owner portfolio."""
-    PLATFORM_CHOICES = [('windows', 'Windows'), ('android', 'Android')]
+    """Public portfolio application and its optional distribution links/files."""
+    PLATFORM_CHOICES = [
+        ('web', 'Web'),
+        ('android', 'Android'),
+        ('windows', 'Windows/Desktop'),
+        ('other', 'Other'),
+    ]
     name = models.CharField(max_length=200)
-    description = models.TextField()
-    version = models.CharField(max_length=50)
-    platform = models.CharField(max_length=10, choices=PLATFORM_CHOICES, editable=False)
+    short_description = models.CharField(max_length=300, blank=True)
+    description = models.TextField(blank=True)
+    version = models.CharField(max_length=50, blank=True)
+    platform = models.CharField(max_length=10, choices=PLATFORM_CHOICES, default='other')
+    category = models.CharField(max_length=100, blank=True)
+    technologies = models.TextField(blank=True)
+    features = models.TextField(blank=True)
+    website_url = models.URLField(max_length=500, blank=True, null=True)
+    download_url = models.URLField(max_length=500, blank=True, null=True)
     file = models.FileField(
         upload_to=app_upload_path,
-        validators=[FileExtensionValidator(['exe', 'apk'])],
+        validators=[FileExtensionValidator(['exe', 'apk', 'msi', 'zip'])],
+        blank=True,
+        null=True,
         max_length=500,
     )
-    original_filename = models.CharField(max_length=255, editable=False)
+    original_filename = models.CharField(max_length=255, blank=True, editable=False)
     file_size = models.PositiveBigIntegerField(default=0, editable=False)
     icon = models.ImageField(upload_to='app-icons/', blank=True, null=True)
     is_published = models.BooleanField(default=False)
@@ -399,17 +425,52 @@ class Application(models.Model):
         if self.file:
             name = self.file.name
             extension = name.rsplit('.', 1)[-1].lower()
-            if extension not in ('exe', 'apk'):
-                raise ValidationError('Only .exe and .apk files are allowed.')
-            self.platform = 'windows' if extension == 'exe' else 'android'
-            if hasattr(self.file, 'size'):
+            if extension not in ('exe', 'apk', 'msi', 'zip'):
+                raise ValidationError('Only .exe, .apk, .msi, and .zip files are allowed.')
+            if extension == 'exe':
+                self.platform = 'windows'
+            elif extension == 'apk':
+                self.platform = 'android'
+            if not self.file._committed:
                 self.file_size = self.file.size
             if hasattr(self.file, 'name'):
                 self.original_filename = name.rsplit('/', 1)[-1].rsplit('\\\\', 1)[-1][:255]
+        else:
+            self.file_size = 0
+            self.original_filename = ''
         super().save(*args, **kwargs)
+
+    @property
+    def safe_website_url(self):
+        return sanitize_external_url(self.website_url)
+
+    @property
+    def safe_download_url(self):
+        return sanitize_external_url(self.download_url)
+
+    @property
+    def feature_list(self):
+        return _parse_list_field(self.features)
 
     def __str__(self):
         return self.name
+
+
+class ApplicationImage(models.Model):
+    """Screenshot or promotional image belonging to an application."""
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        related_name='images',
+    )
+    image = models.ImageField(upload_to=application_image_upload_path)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return f"Screenshot for {self.application.name}"
 
 
 class Skill(models.Model):
@@ -514,3 +575,34 @@ class AlbumImage(models.Model):
 
     def __str__(self):
         return f"Album image: {self.album.album_name}"
+
+
+class PerspectivePage(models.Model):
+    """Published personal introduction shown on the More About Me page."""
+    title = models.CharField(max_length=120, default="More About Me")
+    introduction = models.TextField()
+    is_published = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+
+class PerspectiveSection(models.Model):
+    """An ordered, editable section on the More About Me page."""
+    page = models.ForeignKey(
+        PerspectivePage,
+        on_delete=models.CASCADE,
+        related_name="sections",
+    )
+    title = models.CharField(max_length=120)
+    subtitle = models.CharField(max_length=180, blank=True)
+    content = models.TextField(blank=True)
+    order = models.PositiveIntegerField(default=0)
+    is_published = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return self.title

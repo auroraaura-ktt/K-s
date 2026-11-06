@@ -6,6 +6,7 @@ The `urlpatterns` list routes URLs to views. For more information please see:
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import RedirectView
 from mytask import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -21,6 +22,11 @@ urlpatterns = [
     path('myadmin/', include('customadmin.urls', namespace='customadmin')),
     path('', views.home, name='home'),
     path('about/', views.about, name='about'),
+    path('about/more-about-me/', views.perspective, name='perspective'),
+    path(
+        'about/my-perspective/',
+        RedirectView.as_view(url='/about/more-about-me/', permanent=True),
+    ),
     path('education/', views.education, name='education'),
     path('projects/', views.projects, name='projects'),
     path('project/<int:project_id>/', views.project_detail, name='project_detail'),

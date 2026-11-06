@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import RedirectView
 from . import views
 
 app_name = 'customadmin'
@@ -10,6 +11,11 @@ urlpatterns = [
 
     # Dashboard
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('more-about-me/', views.perspective_edit, name='perspective_edit'),
+    path(
+        'perspective/',
+        RedirectView.as_view(pattern_name='customadmin:perspective_edit', permanent=True),
+    ),
 
     # Profile
     path('profile/', views.profile_list, name='profile_list'),
@@ -30,6 +36,12 @@ urlpatterns = [
     path('applications/add/', views.application_add, name='application_add'),
     path('applications/<int:pk>/edit/', views.application_edit, name='application_edit'),
     path('applications/<int:pk>/delete/', views.application_delete, name='application_delete'),
+    path('applications/<int:pk>/preview/', views.application_preview, name='application_preview'),
+    path(
+        'applications/<int:pk>/image/<int:image_pk>/delete/',
+        views.application_image_delete,
+        name='application_image_delete',
+    ),
 
     # Albums
     path('albums/', views.album_list, name='album_list'),

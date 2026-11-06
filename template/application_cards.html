@@ -1,0 +1,48 @@
+<div class="apps-grid">
+    {% for app in applications %}
+    <article class="app-card">
+        <div class="card-top">
+            <div class="app-icon">
+                {% if app.icon %}
+                <img src="{{ app.icon.url }}" alt="{{ app.name }} icon" loading="lazy" decoding="async">
+                {% else %}
+                {% if app.platform == 'windows' %}<i class="fa-brands fa-windows" aria-hidden="true"></i>
+                {% elif app.platform == 'android' %}<i class="fa-brands fa-android" aria-hidden="true"></i>
+                {% elif app.platform == 'web' %}<i class="fa-solid fa-globe" aria-hidden="true"></i>
+                {% else %}<i class="fa-solid fa-cube" aria-hidden="true"></i>{% endif %}
+                {% endif %}
+            </div>
+            <div class="app-card-summary">
+                <div class="card-title"><h3>{{ app.name }}</h3></div>
+                {% if app.short_description or app.description %}
+                <p class="card-copy">{{ app.short_description|default:app.description|truncatechars:100 }}</p>
+                {% endif %}
+                <div class="pills">
+                    <span class="pill">{{ app.get_platform_display }}</span>
+                    {% if app.version %}<span class="pill">v{{ app.version }}</span>{% endif %}
+                    {% if app.category %}<span class="pill">{{ app.category }}</span>{% endif %}
+                </div>
+            </div>
+        </div>
+        {% if app.images.all %}
+        <a class="app-showcase-preview" href="{% url 'app_detail' app.id %}" aria-label="View {{ app.name }} details">
+            <img src="{{ app.images.all.0.image.url }}" alt="{{ app.name }} screenshot preview" loading="lazy" decoding="async">
+        </a>
+        {% else %}
+        <div class="app-showcase-preview app-showcase-preview-empty" aria-hidden="true">
+            {% if app.icon %}
+            <img src="{{ app.icon.url }}" alt="" loading="lazy" decoding="async">
+            {% elif app.platform == 'windows' %}<i class="fa-brands fa-windows"></i>
+            {% elif app.platform == 'android' %}<i class="fa-brands fa-android"></i>
+            {% elif app.platform == 'web' %}<i class="fa-solid fa-globe"></i>
+            {% else %}<i class="fa-solid fa-cube"></i>{% endif %}
+        </div>
+        {% endif %}
+        <div class="card-actions">
+            <a class="details-link" href="{% url 'app_detail' app.id %}">
+                View Details <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+            </a>
+        </div>
+    </article>
+    {% endfor %}
+</div>

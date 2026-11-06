@@ -1,10 +1,15 @@
 ﻿from django import forms
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image, ImageOps
 
+from io import BytesIO
 from zipfile import BadZipFile, ZipFile
 
 from mytask.models import (
     Application,
+    ApplicationImage,
+    sanitize_external_url,
     Profile,
     Project,
     Skill,
@@ -12,6 +17,8 @@ from mytask.models import (
     Education,
     SocialLink,
     Album,
+    PerspectivePage,
+    PerspectiveSection,
 )
 
 
@@ -156,59 +163,180 @@ class ProjectForm(forms.ModelForm):
         }
 
 class ApplicationForm(forms.ModelForm):
-    """Form for uploading and managing downloadable applications (.exe / .apk)."""
+    """Form for managing public app details and optional distribution files."""
 
     MAX_FILE_SIZE = 200 * 1024 * 1024  # 200 MB
+    MAX_SCREENSHOT_SIZE = 10 * 1024 * 1024
+    MAX_SCREENSHOTS_PER_UPLOAD = 20
+    platform = forms.ChoiceField(
+        choices=Application.PLATFORM_CHOICES,
+        required=False,
+        initial='other',
+        widget=forms.Select(attrs={'class': 'form-input'}),
+    )
 
-    # Executable / installer file signatures (magic bytes) so we validate the
-    # actual file content and do not trust the client-provided extension/MIME.
     _SIGNATURES = {
         'exe': (b'MZ', 'Windows executable (.exe)'),
         'apk': (b'PK\x03\x04', 'Android package (.apk)'),
+        'msi': (b'\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1', 'Windows installer (.msi)'),
+        'zip': (b'PK\x03\x04', 'ZIP archive (.zip)'),
     }
+
+    images = MultipleImageField(label='Screenshots and review photos')
 
     class Meta:
         model = Application
         fields = [
-            'name', 'description', 'version', 'file', 'icon',
+            'name', 'short_description', 'description', 'platform', 'version',
+            'category', 'technologies', 'features', 'website_url', 'download_url', 'file', 'icon',
             'is_published', 'is_publicly_downloadable',
         ]
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Application name'}),
-            'description': forms.Textarea(attrs={'rows': 4, 'class': 'form-input', 'placeholder': 'What does this application do?'}),
+            'short_description': forms.Textarea(attrs={
+                'rows': 2, 'class': 'form-input', 'placeholder': 'A brief introduction',
+            }),
+            'description': forms.Textarea(attrs={
+                'rows': 5, 'class': 'form-input', 'placeholder': 'Detailed app information',
+            }),
+            'platform': forms.Select(attrs={'class': 'form-input'}),
             'version': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'e.g. 1.0.0'}),
-            'file': forms.ClearableFileInput(attrs={'class': 'form-input', 'accept': '.exe,.apk'}),
-            'icon': forms.ClearableFileInput(attrs={'class': 'form-input', 'accept': 'image/*'}),
+            'category': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'e.g. Productivity'}),
+            'technologies': forms.Textarea(attrs={
+                'rows': 3, 'class': 'form-input', 'placeholder': 'React, Python, Flutter...',
+            }),
+            'features': forms.Textarea(attrs={
+                'rows': 4, 'class': 'form-input', 'placeholder': 'One application feature per line',
+            }),
+            'website_url': forms.URLInput(attrs={
+                'class': 'form-input', 'placeholder': 'https://example.com',
+            }),
+            'download_url': forms.URLInput(attrs={
+                'class': 'form-input', 'placeholder': 'https://github.com/.../releases/download/...',
+            }),
+            'file': forms.ClearableFileInput(attrs={
+                'class': 'form-input', 'accept': '.exe,.apk,.msi,.zip',
+            }),
+            'icon': forms.ClearableFileInput(attrs={
+                'class': 'form-input', 'accept': 'image/*',
+            }),
             'is_published': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
             'is_publicly_downloadable': forms.CheckboxInput(attrs={'class': 'form-checkbox'}),
         }
         help_texts = {
             'version': 'Application version, e.g. 1.0.0',
+            'features': 'Optional. Enter one feature per line.',
             'is_published': 'Publish so the app appears on the public Apps page.',
-            'is_publicly_downloadable': 'Allow visitors to download the file (only applies when published).',
+            'is_publicly_downloadable': 'Show available download options to visitors (only applies when published).',
+            'file': 'Optional. Files larger than 200 MB should be hosted externally instead.',
+            'download_url': 'Optional. Paste a public HTTP(S) URL, including a GitHub Releases asset URL.',
         }
+
+    def clean_website_url(self):
+        return self._clean_public_url('website_url')
+
+    def clean_platform(self):
+        return self.cleaned_data.get('platform') or 'other'
+
+    def clean_download_url(self):
+        return self._clean_public_url('download_url')
+
+    def _clean_public_url(self, field_name):
+        value = (self.cleaned_data.get(field_name) or '').strip()
+        if value and not sanitize_external_url(value):
+            raise forms.ValidationError('Enter a safe public HTTP or HTTPS URL.')
+        return value or None
+
+    def clean_images(self):
+        images = self.cleaned_data.get('images', [])
+        if len(images) > self.MAX_SCREENSHOTS_PER_UPLOAD:
+            raise forms.ValidationError(
+                f'Upload no more than {self.MAX_SCREENSHOTS_PER_UPLOAD} screenshots at once.'
+            )
+        for image in images:
+            if image.size > self.MAX_SCREENSHOT_SIZE:
+                raise forms.ValidationError('Each screenshot must be 10 MB or smaller.')
+        return [self._optimize_screenshot(image) for image in images]
+
+    @staticmethod
+    def _optimize_screenshot(upload):
+        upload.seek(0)
+        with Image.open(upload) as source:
+            image_format = source.format
+            if image_format not in ('JPEG', 'PNG', 'WEBP'):
+                upload.seek(0)
+                return upload
+
+            image = ImageOps.exif_transpose(source)
+            image.thumbnail((2000, 2000), Image.Resampling.LANCZOS)
+            optimized = BytesIO()
+            options = {'optimize': True}
+            if image_format in ('JPEG', 'WEBP'):
+                options['quality'] = 88
+            image.save(optimized, format=image_format, **options)
+
+        if optimized.tell() >= upload.size:
+            upload.seek(0)
+            return upload
+        return SimpleUploadedFile(
+            upload.name,
+            optimized.getvalue(),
+            content_type=upload.content_type,
+        )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        self.image_orders = {}
+        if self.instance.pk:
+            for image in self.instance.images.all():
+                value = self.data.get(f'image_order_{image.pk}')
+                if value is None:
+                    continue
+                try:
+                    order = int(value)
+                    if order < 0:
+                        raise ValueError
+                except (TypeError, ValueError):
+                    self.add_error('images', 'Screenshot order must be a non-negative number.')
+                else:
+                    self.image_orders[image.pk] = order
+        return cleaned_data
+
+    def save_images(self, application):
+        for image in application.images.all():
+            if image.pk in self.image_orders:
+                image.order = self.image_orders[image.pk]
+                image.save(update_fields=['order'])
+
+        next_order = max(
+            (image.order for image in application.images.all()),
+            default=-1,
+        ) + 1
+        for offset, upload in enumerate(self.cleaned_data.get('images', [])):
+            ApplicationImage.objects.create(
+                application=application,
+                image=upload,
+                order=next_order + offset,
+            )
 
     def clean_file(self):
         file = self.cleaned_data.get('file')
         if not file:
-            # On edits, a missing file means "keep the existing file."
             return file
 
-        # Reject empty files.
         if getattr(file, 'size', None) == 0:
             raise forms.ValidationError('The uploaded file is empty.')
 
-        # Enforce a maximum file size.
         if file.size > self.MAX_FILE_SIZE:
             mb = self.MAX_FILE_SIZE // (1024 * 1024)
-            raise forms.ValidationError(f'File is too large. Maximum size is {mb} MB.')
+            raise forms.ValidationError(
+                f'File is too large. Maximum size is {mb} MB; use an external download URL for larger files.'
+            )
 
-        # Validate actual file content (magic bytes), not the client-provided
-        # extension or MIME type.
         extension = (file.name.rsplit('.', 1)[-1] if '.' in file.name else '').lower()
         expected, label = self._SIGNATURES.get(extension, (None, None))
         if expected is None:
-            raise forms.ValidationError('Only .exe and .apk files are allowed.')
+            raise forms.ValidationError('Only .exe, .apk, .msi, and .zip files are allowed.')
 
         header = file.read(len(expected))
         file.seek(0)
@@ -229,11 +357,11 @@ class ApplicationForm(forms.ModelForm):
             file.seek(pe_offset)
             if file.read(4) != b'PE\x00\x00':
                 raise forms.ValidationError('The file does not contain a valid Windows PE signature.')
-        else:
+        elif extension in ('apk', 'zip'):
             file.seek(0)
             try:
                 with ZipFile(file) as apk:
-                    if 'AndroidManifest.xml' not in apk.namelist():
+                    if extension == 'apk' and 'AndroidManifest.xml' not in apk.namelist():
                         raise forms.ValidationError(
                             'The APK archive is missing AndroidManifest.xml.'
                         )
@@ -264,6 +392,35 @@ class AlbumForm(forms.ModelForm):
                 'class': 'form-input', 'accept': 'image/*,.heic,.heif',
             }),
         }
+
+
+class PerspectivePageForm(forms.ModelForm):
+    class Meta:
+        model = PerspectivePage
+        fields = ["title", "introduction", "is_published"]
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-input"}),
+            "introduction": forms.Textarea(attrs={"class": "form-input", "rows": 5}),
+            "is_published": forms.CheckboxInput(attrs={"class": "form-checkbox"}),
+        }
+
+
+class PerspectiveSectionForm(forms.ModelForm):
+    class Meta:
+        model = PerspectiveSection
+        fields = ["title", "subtitle", "content", "order", "is_published"]
+        labels = {"is_published": "Published on public page"}
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-input"}),
+            "subtitle": forms.TextInput(attrs={
+                "class": "form-input",
+                "placeholder": "Optional subtitle",
+            }),
+            "content": forms.Textarea(attrs={"class": "form-input", "rows": 4}),
+            "order": forms.NumberInput(attrs={"class": "form-input", "min": 0}),
+            "is_published": forms.CheckboxInput(attrs={"class": "form-checkbox"}),
+        }
+
 
 class SkillForm(forms.ModelForm):
     class Meta:

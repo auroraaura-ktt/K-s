@@ -1,67 +1,186 @@
 {% extends 'customadmin/base.html' %}
 
-{% block title %}{{ action }} Application{% endblock %}
+{% block title %}{{ action }} App{% endblock %}
 
 {% block content %}
-<div style="max-width: 48rem; margin: 0 auto;">
+<div style="max-width: 58rem; margin: 0 auto;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--color-text);">{{ action }} Application</h1>
-        <a href="{% url 'customadmin:application_list' %}" class="btn-secondary">Back</a>
+        <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--color-text);">{{ action }} App</h1>
+        <div style="display: flex; gap: .5rem;">
+            {% if application %}<a href="{% url 'customadmin:application_preview' application.pk %}" class="btn-secondary" target="_blank" rel="noopener">Preview</a>{% endif %}
+            <a href="{% url 'customadmin:application_list' %}" class="btn-secondary">Back</a>
+        </div>
     </div>
 
     <div class="card" style="padding: 1.5rem;">
-        <form method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1rem;">
+        <form id="app-form" method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1rem;">
             {% csrf_token %}
-            <div>
-                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Name</label>
-                {{ form.name }}
+            {% if form.non_field_errors %}<div class="form-error">{{ form.non_field_errors }}</div>{% endif %}
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 1rem;">
+                <div>
+                    <label for="{{ form.name.id_for_label }}">App name</label>
+                    {{ form.name }}{{ form.name.errors }}
+                </div>
+                <div>
+                    <label for="{{ form.platform.id_for_label }}">App type</label>
+                    {{ form.platform }}{{ form.platform.errors }}
+                </div>
             </div>
             <div>
-                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Description</label>
-                {{ form.description }}
+                <label for="{{ form.short_description.id_for_label }}">Short description <span>(optional)</span></label>
+                {{ form.short_description }}{{ form.short_description.errors }}
             </div>
             <div>
-                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Platform</label>
-                {{ form.platform }}
+                <label for="{{ form.description.id_for_label }}">Full description <span>(optional)</span></label>
+                {{ form.description }}{{ form.description.errors }}
             </div>
+
             <div>
-                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Application File (.exe or .apk)</label>
-                {{ form.file }}
-                {% if form.file.errors %}
-                <p style="font-size: 0.75rem; color: #dc2626; margin-top: 0.25rem;">{{ form.file.errors.0 }}</p>
-                {% endif %}
-                <p style="font-size: 0.75rem; color: #6b7582; margin-top: 0.25rem;">Windows .exe or Android .apk only. Max 200 MB. File content is checked for the expected executable or package structure.</p>
+                <label for="{{ form.icon.id_for_label }}">App logo / icon <span>(optional)</span></label>
+                {{ form.icon }}{{ form.icon.errors }}
+                {% if application.icon %}<img src="{{ application.icon.url }}" alt="Current app icon" width="72" height="72" style="object-fit: cover; border-radius: 12px; margin-top: .5rem;">{% endif %}
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
                 <div>
-                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Version</label>
-                    {{ form.version }}
+                    <label for="{{ form.version.id_for_label }}">Version <span>(optional)</span></label>
+                    {{ form.version }}{{ form.version.errors }}
                 </div>
                 <div>
-                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: var(--color-text); margin-bottom: 0.25rem;">Download Count</label>
-                    {{ form.download_count }}
+                    <label for="{{ form.category.id_for_label }}">Category <span>(optional)</span></label>
+                    {{ form.category }}{{ form.category.errors }}
                 </div>
             </div>
 
-            <div style="display: flex; align-items: center;">
-                {{ form.is_published }}
-                <label style="margin-left: 0.5rem; font-size: 0.875rem; font-weight: 500; color: var(--color-text);">Published (visible on public apps page)</label>
-            </div>
-            <div style="display: flex; align-items: center;">
-                {{ form.is_publicly_downloadable }}
-                <label style="margin-left: 0.5rem; font-size: 0.875rem; font-weight: 500; color: var(--color-text);">Publicly Downloadable (allows direct file download)</label>
+            <div>
+                <label for="{{ form.technologies.id_for_label }}">Technologies <span>(optional)</span></label>
+                {{ form.technologies }}{{ form.technologies.errors }}
             </div>
 
-            {% if application and application.file %}
-            <div style="background: rgba(0,0,0,0.05); border-radius: 6px; padding: 1rem; margin-top: 0.5rem;">
-                <p style="font-size: 0.875rem; color: #4b5563; margin: 0 0 0.5rem 0;"><strong>Current file:</strong> {{ application.original_filename }}</p>
-                <p style="font-size: 0.75rem; color: #6b7280; margin: 0;">Uploading a new file will replace the existing one.</p>
+            <div>
+                <label for="{{ form.website_url.id_for_label }}">Website / live demo URL <span>(optional)</span></label>
+                {{ form.website_url }}{{ form.website_url.errors }}
+            </div>
+
+            <div>
+                <label for="{{ form.file.id_for_label }}">Upload application file <span>(optional)</span></label>
+                {{ form.file }}{{ form.file.errors }}
+                <p style="font-size: .8rem; color: #6b7582;">APK, EXE, MSI, or ZIP; up to 200 MB. Larger files should be hosted externally—this upload limit is not bypassed.</p>
+                {% if application.file %}
+                <p style="font-size: .875rem; color: #4b5563;"><strong>Uploaded file:</strong> {{ application.original_filename }} ({{ application.file_size|filesizeformat }})</p>
+                {% endif %}
+                <p style="font-size: .8rem; color: #6b7582;">Uploaded files are stored by the site's media storage and are distinct from external links.</p>
+            </div>
+
+            <div>
+                <label for="{{ form.download_url.id_for_label }}">External download URL <span>(optional)</span></label>
+                {{ form.download_url }}{{ form.download_url.errors }}
+                <p style="font-size: .8rem; color: #6b7582;">Paste a public HTTP(S) link, such as a GitHub Releases asset URL. This link is saved as-is; the file is not sent through this site.</p>
+                {% if application.download_url %}<p style="font-size: .8rem; color: #6b7582;">Current external link: {{ application.download_url }}</p>{% endif %}
+            </div>
+
+            <div>
+                <label for="{{ form.images.id_for_label }}">Screenshots / review photos <span>(optional)</span></label>
+                {{ form.images }}{{ form.images.errors }}
+                <p style="font-size: .8rem; color: #6b7582;">Select up to 20 images at once; each must be 10 MB or smaller. You can add more later.</p>
+                <div id="image-previews" style="display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem;"></div>
+            </div>
+
+            {% if application.images.all %}
+            <div>
+                <h2 style="font-size: 1rem; font-weight: 600;">Saved screenshots</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
+                    {% for image in application.images.all %}
+                    <div class="card" style="padding: .75rem;">
+                        <img src="{{ image.image.url }}" alt="App screenshot {{ forloop.counter }}" loading="lazy" style="width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px;">
+                        <label for="image-order-{{ image.pk }}">Display order</label>
+                        <input id="image-order-{{ image.pk }}" class="form-input" type="number" min="0" name="image_order_{{ image.pk }}" value="{{ image.order }}" form="app-form">
+                        <button class="btn-secondary" type="submit" form="delete-app-image-{{ image.pk }}" style="margin-top: .5rem; color: #b91c1c;">Remove image</button>
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
             {% endif %}
 
-            <button type="submit" class="btn-primary" style="width: 100%;">Save</button>
+            <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
+                <label style="display: flex; align-items: center; gap: .5rem;">{{ form.is_published }} Publish this app</label>
+                <label style="display: flex; align-items: center; gap: .5rem;">{{ form.is_publicly_downloadable }} Show available downloads publicly</label>
+            </div>
+            {{ form.is_published.errors }}{{ form.is_publicly_downloadable.errors }}
+
+            <div id="upload-progress" hidden aria-live="polite">
+                <progress id="upload-progress-bar" max="100" value="0" style="width: 100%;"></progress>
+                <span id="upload-progress-label">Uploading… 0%</span>
+            </div>
+            <button id="save-app-button" type="submit" class="btn-primary" style="width: 100%;">Save App</button>
         </form>
+
+        {% if application %}
+        {% for image in application.images.all %}
+        <form id="delete-app-image-{{ image.pk }}" method="post" action="{% url 'customadmin:application_image_delete' application.pk image.pk %}">
+            {% csrf_token %}
+        </form>
+        {% endfor %}
+        {% endif %}
     </div>
 </div>
+<script>
+(() => {
+    const form = document.getElementById('app-form');
+    const fileInput = document.getElementById('id_images');
+    const previewArea = document.getElementById('image-previews');
+    const progress = document.getElementById('upload-progress');
+    const progressBar = document.getElementById('upload-progress-bar');
+    const progressLabel = document.getElementById('upload-progress-label');
+    const submitButton = document.getElementById('save-app-button');
+
+    if (fileInput && previewArea) {
+        fileInput.addEventListener('change', () => {
+            previewArea.replaceChildren();
+            Array.from(fileInput.files).forEach((file) => {
+                if (!file.type.startsWith('image/')) return;
+                const image = document.createElement('img');
+                image.src = URL.createObjectURL(file);
+                image.alt = `Preview: ${file.name}`;
+                image.loading = 'lazy';
+                image.style.cssText = 'width:120px;height:90px;object-fit:cover;border-radius:8px';
+                previewArea.append(image);
+            });
+        });
+    }
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+
+        submitButton.disabled = true;
+        progress.hidden = false;
+        const request = new XMLHttpRequest();
+        request.open('POST', form.action || window.location.href);
+        request.upload.addEventListener('progress', (progressEvent) => {
+            if (!progressEvent.lengthComputable) return;
+            const percent = Math.round(progressEvent.loaded * 100 / progressEvent.total);
+            progressBar.value = percent;
+            progressLabel.textContent = `Uploading… ${percent}%`;
+        });
+        request.addEventListener('load', () => {
+            if (request.status >= 200 && request.status < 400) {
+                if (request.responseURL && !request.responseURL.includes('/add/') && !request.responseURL.includes('/edit/')) {
+                    window.location.assign(request.responseURL);
+                    return;
+                }
+            }
+            document.open();
+            document.write(request.responseText || 'Upload failed. Please try again.');
+            document.close();
+        });
+        request.addEventListener('error', () => {
+            submitButton.disabled = false;
+            progressLabel.textContent = 'Upload failed. Check your connection and try again.';
+        });
+        request.send(new FormData(form));
+    });
+})();
+</script>
 {% endblock %}

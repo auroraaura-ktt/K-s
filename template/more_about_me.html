@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ perspective_page.title }} - Kay Tii Tii{% endblock %}
+
+{% block content %}
+<section class="section perspective-page">
+    <div class="page-wrap">
+        <header class="perspective-header">
+            <p class="page-label">A little more personal</p>
+            <h1 class="page-title">{{ perspective_page.title }}</h1>
+            <p class="perspective-introduction">{{ perspective_page.introduction|linebreaksbr }}</p>
+            {% if user.is_staff %}
+            <a href="{% url 'customadmin:perspective_edit' %}" class="outline-btn perspective-edit">
+                <i class="fa-solid fa-pen" aria-hidden="true"></i> Edit this page
+            </a>
+            {% endif %}
+        </header>
+
+        <div class="perspective-sections">
+            {% for section in perspective_page.sections.all %}
+            <article class="glass-card perspective-card">
+                <span class="perspective-section-number" aria-hidden="true">{{ forloop.counter|stringformat:"02d" }}</span>
+                <h2>{{ section.title }}</h2>
+                {% if section.subtitle %}<h3>{{ section.subtitle }}</h3>{% endif %}
+                <p>{{ section.content|linebreaksbr }}</p>
+            </article>
+            {% endfor %}
+        </div>
+
+        <div class="perspective-contact">
+            <p>Thanks for taking the time to understand a little more about how I see things.</p>
+            <a href="{% url 'contact' %}" class="primary-btn">
+                Continue the conversation <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

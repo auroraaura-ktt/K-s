@@ -1,25 +1,37 @@
 ﻿from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
+from functools import wraps
 from django.http import HttpResponseForbidden
 from django.views.decorators.http import require_POST
 
-# Staff-only access control: returns 403 for authenticated non-staff users.
-staff_required = user_passes_test(lambda u: u.is_staff, login_url=None)
+# Staff-only access control: authenticated non-staff users receive a 403.
+def staff_required(view_func):
+    @wraps(view_func)
+    def wrapped(request, *args, **kwargs):
+        if not request.user.is_staff:
+            return HttpResponseForbidden()
+        return view_func(request, *args, **kwargs)
+    return wrapped
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.db import transaction
+from django.forms import modelformset_factory
 
 from mytask.models import (
     Application,
+    ApplicationImage,
     Profile,
     Project,
-ProjectImage,
+    ProjectImage,
     Skill,
     Experience,
     Education,
     ContactMessage,
     SocialLink,
-Album,
+    Album,
     AlbumImage,
+    PerspectivePage,
+    PerspectiveSection,
 )
 from .forms import (
     AdminLoginForm,
@@ -28,9 +40,11 @@ from .forms import (
     ProjectForm,
     SkillForm,
     ExperienceForm,
-AlbumForm,
+    AlbumForm,
     EducationForm,
     SocialLinkForm,
+    PerspectivePageForm,
+    PerspectiveSectionForm,
 )
 
 
@@ -77,8 +91,68 @@ def dashboard(request):
         'educations': Education.objects.count(),
         'unread_messages': ContactMessage.objects.filter(is_read=False).count(),
         'total_messages': ContactMessage.objects.count(),
+        'perspective_sections': PerspectiveSection.objects.count(),
+        'published_perspective_sections': PerspectiveSection.objects.filter(
+            is_published=True,
+        ).count(),
+        'perspective_page_published': PerspectivePage.objects.filter(
+            pk=1,
+            is_published=True,
+        ).exists(),
     }
     return render(request, 'customadmin/dashboard.html', {'stats': stats})
+
+
+@login_required
+@staff_required
+def perspective_edit(request):
+    page, _ = PerspectivePage.objects.get_or_create(
+        pk=1,
+        defaults={
+            'title': 'More About Me',
+            'introduction': '',
+        },
+    )
+    section_formset_class = modelformset_factory(
+        PerspectiveSection,
+        form=PerspectiveSectionForm,
+        extra=0,
+        can_delete=True,
+    )
+    sections = PerspectiveSection.objects.filter(page=page)
+
+    if request.method == 'POST':
+        form = PerspectivePageForm(request.POST, instance=page)
+        section_formset = section_formset_class(
+            request.POST,
+            queryset=sections,
+            prefix='sections',
+        )
+        form_is_valid = form.is_valid()
+        sections_are_valid = section_formset.is_valid()
+        if form_is_valid and sections_are_valid:
+            with transaction.atomic():
+                form.save()
+                sections_to_save = section_formset.save(commit=False)
+                for section in section_formset.deleted_objects:
+                    section.delete()
+                for section in sections_to_save:
+                    section.page = page
+                    section.save()
+            messages.success(request, 'More About Me page updated successfully.')
+            return redirect('customadmin:perspective_edit')
+        messages.error(request, 'Please correct the errors below before saving.')
+    else:
+        form = PerspectivePageForm(instance=page)
+        section_formset = section_formset_class(
+            queryset=sections,
+            prefix='sections',
+        )
+
+    return render(request, 'customadmin/more_about_me_form.html', {
+        'form': form,
+        'section_formset': section_formset,
+    })
 
 
 # Profile CRUD
@@ -476,23 +550,42 @@ def album_image_delete(request, pk, image_pk):
 # Application CRUD
 
 
+def _save_application_form(form, existing=None):
+    old_files = []
+    if existing:
+        for field in (existing.file, existing.icon):
+            if field and field.name:
+                old_files.append((field.storage, field.name))
+
+    application = form.save()
+    form.save_images(application)
+
+    current_names = {
+        field.name for field in (application.file, application.icon) if field and field.name
+    }
+    for storage, old_name in old_files:
+        if old_name not in current_names:
+            storage.delete(old_name)
+    return application
+
+
 @login_required
 @staff_required
 def application_list(request):
-    """List all uploaded applications for management."""
-    applications = Application.objects.all().order_by('-date_created')
+    """List all applications for management."""
+    applications = Application.objects.prefetch_related('images').order_by('-date_created')
     return render(request, 'customadmin/application_list.html', {'applications': applications})
 
 
 @login_required
 @staff_required
 def application_add(request):
-    """Upload a new application file."""
+    """Create an application and its optional uploads."""
     if request.method == 'POST':
         form = ApplicationForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Application uploaded successfully.')
+            _save_application_form(form)
+            messages.success(request, 'Application created successfully.')
             return redirect('customadmin:application_list')
     else:
         form = ApplicationForm()
@@ -502,16 +595,12 @@ def application_add(request):
 @login_required
 @staff_required
 def application_edit(request, pk):
-    """Edit application metadata and replace its binary file."""
+    """Edit application details, distribution files, and screenshots."""
     app = get_object_or_404(Application, pk=pk)
-    old_file = app.file if app.file else None
     if request.method == 'POST':
         form = ApplicationForm(request.POST, request.FILES, instance=app)
         if form.is_valid():
-            form.save()
-            # Replace: remove the previously stored binary when a new file was uploaded.
-            if old_file and form.cleaned_data.get('file'):
-                old_file.delete(save=False)
+            _save_application_form(form, existing=app)
             messages.success(request, 'Application updated successfully.')
             return redirect('customadmin:application_list')
     else:
@@ -523,12 +612,50 @@ def application_edit(request, pk):
 
 @login_required
 @staff_required
+def application_preview(request, pk):
+    """Preview an unpublished or published application without exposing it publicly."""
+    app = get_object_or_404(
+        Application.objects.prefetch_related('images'),
+        pk=pk,
+    )
+    active_tab = (
+        'about' if app.description or app.short_description
+        else 'features' if app.feature_list
+        else 'details'
+    )
+    return render(request, 'app_detail.html', {
+        'app': app,
+        'preview': True,
+        'active_tab': active_tab,
+    })
+
+
+@login_required
+@staff_required
+@require_POST
+def application_image_delete(request, pk, image_pk):
+    image = get_object_or_404(ApplicationImage, pk=image_pk, application_id=pk)
+    application = image.application
+    if image.image:
+        image.image.delete(save=False)
+    image.delete()
+    messages.success(request, 'Application screenshot deleted successfully.')
+    return redirect('customadmin:application_edit', pk=application.pk)
+
+
+@login_required
+@staff_required
 def application_delete(request, pk):
-    """Delete an application and its stored file."""
+    """Delete an application and its stored media."""
     app = get_object_or_404(Application, pk=pk)
     if request.method == 'POST':
+        stored_files = [app.file, app.icon]
+        stored_files.extend(image.image for image in app.images.all())
+        for stored_file in stored_files:
+            if stored_file and stored_file.name:
+                stored_file.delete(save=False)
         app.delete()
-        messages.success(request, 'Application deleted successfully.')
+        messages.success(request, 'Application and its screenshots deleted successfully.')
         return redirect('customadmin:application_list')
     return render(request, 'customadmin/confirm_delete.html', {
         'object': app, 'model_name': 'Application',

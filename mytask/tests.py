@@ -13,7 +13,14 @@ from django.test import SimpleTestCase, TestCase, override_settings
 from PIL import Image
 
 from .forms import AlbumAdminForm
-from .models import Album, Project, ProjectImage
+from .models import (
+    Album,
+    Application,
+    ApplicationImage,
+    PerspectivePage,
+    Project,
+    ProjectImage,
+)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -466,6 +473,162 @@ class ProjectDetailCssTests(SimpleTestCase):
         self.assertNotIn("text-align: left", self.region)
 
 
+class ApplicationShowcaseTests(TestCase):
+    def setUp(self):
+        self.app = Application.objects.create(
+            name="Pocket Planner",
+            short_description="Plan your day on the go.",
+            description=(
+                "## Highlights\n"
+                "- Organize tasks by day.\n"
+                "- Share plans with a team.\n\n"
+                "More details at [the project site](https://example.com/app)."
+            ),
+            platform="android",
+            version="2.4",
+            category="Productivity",
+            technologies="Kotlin\nSQLite",
+            features="Plan tasks by day\nSync plans across devices",
+            is_published=True,
+        )
+
+    def test_website_projects_and_published_applications_are_separate(self):
+        website_project = Project.objects.create(
+            title="Portfolio website",
+            description="A website project.",
+        )
+        unpublished = Application.objects.create(
+            name="Private preview",
+            platform="web",
+            is_published=False,
+        )
+
+        projects_response = self.client.get("/projects/")
+        self.assertEqual(projects_response.status_code, 200)
+        self.assertContains(projects_response, website_project.title)
+        self.assertNotContains(projects_response, self.app.name)
+        self.assertNotContains(projects_response, unpublished.name)
+
+        apps_response = self.client.get("/apps/")
+        self.assertEqual(apps_response.status_code, 200)
+        self.assertContains(apps_response, self.app.name)
+        self.assertContains(apps_response, "View Details")
+        self.assertContains(apps_response, "Plan your day on the go.")
+        self.assertNotContains(apps_response, website_project.title)
+        self.assertNotContains(apps_response, unpublished.name)
+        self.assertNotContains(apps_response, "Highlights")
+        self.assertNotContains(apps_response, 'class="details"')
+        self.assertNotContains(apps_response, 'class="app-details-card"')
+        self.assertEqual(self.client.get(f"/app/{unpublished.pk}/").status_code, 404)
+
+    def test_application_listing_and_details_use_separate_pages(self):
+        website_project = Project.objects.create(
+            title="Portfolio website",
+            description="A website project.",
+        )
+        another_app = Application.objects.create(
+            name="Desktop Timer",
+            short_description="A different published application.",
+            platform="windows",
+            is_published=True,
+        )
+
+        listing_response = self.client.get("/apps/")
+        self.assertContains(listing_response, f'href="/app/{self.app.pk}/"')
+        self.assertNotContains(listing_response, 'class="app-details-card"')
+        self.assertNotContains(listing_response, 'class="details"')
+        self.assertContains(listing_response, another_app.name)
+
+        detail_response = self.client.get(f"/app/{self.app.pk}/")
+        self.assertEqual(detail_response.status_code, 200)
+        self.assertTemplateUsed(detail_response, "app_detail.html")
+        self.assertContains(detail_response, 'class="app-details-card"')
+        self.assertContains(detail_response, 'href="/apps/" class="app-back-link"')
+        self.assertContains(detail_response, f'data-copy-value="http://testserver/app/{self.app.pk}/"')
+        self.assertNotContains(detail_response, 'class="catalog"')
+        self.assertNotContains(detail_response, website_project.title)
+        self.assertNotContains(detail_response, another_app.name)
+
+        self.assertContains(
+            self.client.get(f"/app/{another_app.pk}/"),
+            another_app.name,
+        )
+        self.assertEqual(self.client.get("/app/999999/").status_code, 404)
+
+    def test_detail_renders_formatted_description_and_safe_links(self):
+        response = self.client.get(f"/app/{self.app.pk}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<h3>Highlights</h3>", html=True)
+        self.assertContains(response, "<ul>")
+        self.assertContains(response, "<li>Organize tasks by day.</li>", html=True)
+        self.assertContains(
+            response,
+            'href="https://example.com/app" target="_blank" rel="noopener noreferrer"',
+        )
+        self.assertContains(response, "Kotlin")
+        self.assertContains(response, "Version 2.4")
+        self.assertContains(response, "Plan tasks by day")
+        self.assertContains(response, 'data-app-tab="about"')
+        self.assertContains(response, 'data-app-tab="features"')
+        self.assertContains(response, 'data-app-tab="details"')
+        self.assertContains(response, f'data-copy-value="http://testserver/app/{self.app.pk}/"')
+        self.assertNotContains(response, "Download uploaded file")
+        self.assertNotContains(response, "External download")
+
+    def test_download_actions_use_only_the_publicly_available_download_url(self):
+        self.app.download_url = "https://downloads.example.com/pocket-planner.apk"
+        self.app.is_publicly_downloadable = True
+        self.app.save(update_fields=["download_url", "is_publicly_downloadable"])
+
+        response = self.client.get(f"/app/{self.app.pk}/")
+
+        self.assertContains(response, "Copy Download Link")
+        self.assertContains(
+            response,
+            'data-copy-value="https://downloads.example.com/pocket-planner.apk"',
+        )
+        self.assertContains(
+            response,
+            'href="https://downloads.example.com/pocket-planner.apk" target="_blank" rel="noopener noreferrer"',
+        )
+
+    def test_description_escapes_html_and_rejects_unsafe_link_schemes(self):
+        self.app.description = (
+            "<script>alert(1)</script>\n"
+            "[unsafe](javascript:alert(1))"
+        )
+        self.app.save(update_fields=["description"])
+
+        response = self.client.get(f"/app/{self.app.pk}/")
+        self.assertContains(response, "&lt;script&gt;alert(1)&lt;/script&gt;")
+        self.assertNotContains(response, "<script>alert(1)</script>")
+        self.assertNotContains(response, 'href="javascript:alert(1)')
+
+    def test_gallery_preserves_all_screenshot_choices_and_hides_empty_downloads(self):
+        ApplicationImage.objects.create(
+            application=self.app,
+            image="app-screenshots/portrait.png",
+            order=0,
+        )
+        ApplicationImage.objects.create(
+            application=self.app,
+            image="app-screenshots/landscape.png",
+            order=1,
+        )
+
+        response = self.client.get(f"/app/{self.app.pk}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "data-gallery-image")
+        self.assertContains(response, "data-gallery-thumb")
+        self.assertContains(response, "data-gallery-dot")
+        self.assertContains(response, "Previous screenshot")
+        self.assertContains(response, "Next screenshot")
+        self.assertContains(response, "data-gallery-dialog")
+        self.assertNotContains(response, "Download")
+
+
 class AlbumAdminTests(TestCase):
     def test_admin_form_can_create_album_with_photo(self):
         with TemporaryDirectory() as media_dir:
@@ -503,3 +666,31 @@ class AlbumAdminTests(TestCase):
                 self.assertEqual(album.album_name, "Summer Trip")
                 self.assertTrue(album.album_photo)
                 self.assertTrue(album.album_photo.name.startswith("album_photos/"))
+
+
+class PerspectivePageTests(TestCase):
+    def test_published_perspective_is_public_and_has_about_navigation_link(self):
+        response = self.client.get("/about/more-about-me/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "More About Me")
+        self.assertContains(response, "while I was in high school")
+        self.assertContains(response, 'href="/about/more-about-me/"')
+        self.assertNotContains(response, "Edit this page")
+
+    def test_old_public_url_redirects_to_the_new_url(self):
+        response = self.client.get("/about/my-perspective/")
+
+        self.assertRedirects(
+            response,
+            "/about/more-about-me/",
+            status_code=301,
+            fetch_redirect_response=False,
+        )
+
+    def test_unpublished_perspective_is_not_public(self):
+        page = PerspectivePage.objects.get(pk=1)
+        page.is_published = False
+        page.save(update_fields=["is_published"])
+
+        self.assertEqual(self.client.get("/about/more-about-me/").status_code, 404)

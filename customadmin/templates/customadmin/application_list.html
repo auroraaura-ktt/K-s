@@ -1,46 +1,55 @@
 {% extends 'customadmin/base.html' %}
 
-{% block title %}Applications{% endblock %}
+{% block title %}Apps Management{% endblock %}
 
 {% block content %}
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-    <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--color-text);">Applications</h1>
-    <a href="{% url 'customadmin:application_add' %}" class="btn-primary">Add Application</a>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+    <h1 style="font-size: 1.5rem; font-weight: 700; color: var(--color-text);">Apps Management</h1>
+    <a href="{% url 'customadmin:application_add' %}" class="btn-primary">Add App</a>
 </div>
 
 {% if applications %}
-<div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 100%;">
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1.25rem;">
     {% for app in applications %}
-    <div class="card" style="padding: 1.5rem;">
+    <article class="card" style="padding: 1.25rem;">
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-            <div style="font-size: 2.5rem;">
-                {% if app.platform == 'windows' %}🪟{% elif app.platform == 'android' %}🤖{% else %}📦{% endif %}
-            </div>
+            {% if app.icon %}
+            <img src="{{ app.icon.url }}" alt="" width="64" height="64" loading="lazy" style="object-fit: cover; border-radius: 12px;">
+            {% elif app.images.all %}
+            <img src="{{ app.images.all.0.image.url }}" alt="" width="64" height="64" loading="lazy" style="object-fit: cover; border-radius: 12px;">
+            {% else %}
+            <div aria-hidden="true" style="font-size: 2rem;">{% if app.platform == 'windows' %}🖥{% elif app.platform == 'android' %}📱{% elif app.platform == 'web' %}🌐{% else %}📦{% endif %}</div>
+            {% endif %}
             <div>
-                <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--color-text); margin-bottom: 0.25rem;">{{ app.name }}</h3>
-                <span style="font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; background: #e5e7eb; color: #4b5563;">{{ app.platform|title }}</span>
+                <h2 style="font-size: 1.1rem; font-weight: 600; margin: 0 0 .25rem;">{{ app.name }}</h2>
+                <span style="font-size: .75rem; padding: 2px 8px; border-radius: 4px; background: #e5e7eb; color: #4b5563;">{{ app.get_platform_display }}</span>
+                <span style="font-size: .75rem; margin-left: .35rem; color: {% if app.is_published %}#15803d{% else %}#6b7280{% endif %};">{% if app.is_published %}Published{% else %}Unpublished{% endif %}</span>
             </div>
         </div>
-        {% if app.description %}
-        <p style="color: #4b5563; font-size: 0.875rem; margin-bottom: 1rem;">{{ app.description|truncatechars:100 }}</p>
+        {% if app.short_description or app.description %}
+        <p style="color: #4b5563; font-size: .875rem; margin-bottom: 1rem;">{{ app.short_description|default:app.description|truncatechars:120 }}</p>
         {% endif %}
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
-            <div style="font-size: 0.75rem; color: #6b7280;">
-                {{ app.date_created|date:"M d, Y" }}
-                {% if app.file_size %} · {{ app.file_size }} bytes{% endif %}
-            </div>
-            <div style="display: flex; gap: 0.5rem;">
-                <a href="{% url 'customadmin:application_edit' app.pk %}" class="btn-secondary" style="font-size: 0.875rem;">Edit</a>
-                <a href="{% url 'customadmin:application_delete' app.pk %}" style="color: #dc2626; font-size: 0.875rem; text-decoration: none; cursor: pointer;">Delete</a>
+        <div style="display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1rem; font-size: .75rem;">
+            {% if app.file %}<span style="background: #e0f2fe; padding: .2rem .45rem; border-radius: 4px;">Uploaded: {{ app.original_filename }}</span>{% endif %}
+            {% if app.download_url %}<span style="background: #f3e8ff; padding: .2rem .45rem; border-radius: 4px;">External URL</span>{% endif %}
+            {% if app.images.all %}<span style="background: #f3f4f6; padding: .2rem .45rem; border-radius: 4px;">{{ app.images.count }} screenshots</span>{% endif %}
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: .75rem; flex-wrap: wrap;">
+            <span style="font-size: .75rem; color: #6b7280;">Updated {{ app.updated_at|date:"M d, Y" }}</span>
+            <div style="display: flex; gap: .5rem;">
+                <a href="{% url 'customadmin:application_preview' app.pk %}" class="btn-secondary" style="font-size: .875rem;">Preview</a>
+                <a href="{% url 'customadmin:application_edit' app.pk %}" class="btn-secondary" style="font-size: .875rem;">Edit</a>
+                <a href="{% url 'customadmin:application_delete' app.pk %}" style="color: #dc2626; font-size: .875rem; text-decoration: none;">Delete</a>
             </div>
         </div>
-    </div>
+    </article>
     {% endfor %}
 </div>
 {% else %}
-<div style="text-align: center; padding: 3rem 1rem;">
-    <h3 style="font-size: 1.25rem; font-weight: 600; color: #4b5563; margin-bottom: 0.5rem;">No applications found</h3>
-    <a href="{% url 'customadmin:application_add' %}" class="btn-primary">Upload Your First Application</a>
+<div class="card" style="text-align: center; padding: 3rem 1rem;">
+    <h2 style="font-size: 1.25rem; font-weight: 600; color: #4b5563; margin-bottom: .5rem;">No apps yet</h2>
+    <p style="color: #6b7280;">Add web projects, mobile apps, desktop apps, screenshots, and optional downloads.</p>
+    <a href="{% url 'customadmin:application_add' %}" class="btn-primary">Add your first app</a>
 </div>
 {% endif %}
 {% endblock %}
