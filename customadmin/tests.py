@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import PropertyMock, patch
 from tempfile import TemporaryDirectory
 from io import BytesIO
 from html.parser import HTMLParser
@@ -158,6 +158,10 @@ class AdminWorkflowRegressionTests(TestCase):
                 self.assertEqual(storage._get_resource_type(filename), 'raw')
 
         self.assertEqual(storage._get_resource_type('projects/photo.webp'), 'image')
+        self.assertEqual(
+            storage._get_resource_type('app-screenshots/screenshot-id'), 'image'
+        )
+        self.assertEqual(storage._get_resource_type('app-icons/logo-id'), 'image')
         self.assertEqual(
             storage._get_resource_type('media/album_photos/extensionless-id'), 'image'
         )
@@ -334,6 +338,22 @@ class AppManagementTests(TestCase):
         )
 
         self.assertTrue(form.is_valid(), form.errors)
+
+    def test_editing_application_preserves_existing_file_with_unknown_size(self):
+        self.app.file = 'apps/existing-release.apk'
+        self.app.save(update_fields=['file'])
+        form = ApplicationForm(
+            {'name': self.app.name, 'platform': 'android'},
+            instance=self.app,
+        )
+
+        with patch(
+            'django.db.models.fields.files.FieldFile.size',
+            new_callable=PropertyMock,
+            return_value=None,
+        ):
+            self.assertTrue(form.is_valid(), form.errors)
+            self.assertEqual(form.cleaned_data['file'].name, 'apps/existing-release.apk')
 
     def test_multiple_screenshots_can_be_added_reordered_and_removed(self):
         with TemporaryDirectory() as media_dir:

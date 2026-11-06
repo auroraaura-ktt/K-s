@@ -102,7 +102,13 @@ class PortfolioMediaCloudinaryStorage(MediaCloudinaryStorage):
         '.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tif', '.tiff',
         '.heic', '.heif', '.avif',
     }
-    IMAGE_UPLOAD_DIRS = {'profile', 'projects', 'album_photos', 'app-icons'}
+    IMAGE_UPLOAD_DIRS = {
+        'profile',
+        'projects',
+        'album_photos',
+        'app-icons',
+        'app-screenshots',
+    }
 
     def _get_resource_type(self, name):
         path = PurePosixPath(str(name).replace('\\', '/'))

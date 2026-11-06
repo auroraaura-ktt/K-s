@@ -321,13 +321,14 @@ class ApplicationForm(forms.ModelForm):
 
     def clean_file(self):
         file = self.cleaned_data.get('file')
-        if not file:
+        if not file or getattr(file, '_committed', False):
             return file
 
-        if getattr(file, 'size', None) == 0:
+        file_size = file.size
+        if file_size == 0:
             raise forms.ValidationError('The uploaded file is empty.')
 
-        if file.size > self.MAX_FILE_SIZE:
+        if file_size > self.MAX_FILE_SIZE:
             mb = self.MAX_FILE_SIZE // (1024 * 1024)
             raise forms.ValidationError(
                 f'File is too large. Maximum size is {mb} MB; use an external download URL for larger files.'
@@ -352,7 +353,7 @@ class ApplicationForm(forms.ModelForm):
             if len(dos_header) < 64:
                 raise forms.ValidationError('The Windows executable is incomplete or corrupted.')
             pe_offset = int.from_bytes(dos_header[0x3C:0x40], 'little')
-            if pe_offset < 64 or pe_offset + 4 > file.size:
+            if pe_offset < 64 or pe_offset + 4 > file_size:
                 raise forms.ValidationError('The Windows executable has an invalid PE header.')
             file.seek(pe_offset)
             if file.read(4) != b'PE\x00\x00':
